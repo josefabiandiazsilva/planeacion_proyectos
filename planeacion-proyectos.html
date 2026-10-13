@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Planeación de proyectos · Software con enfoque PMI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--red:#E50914;--dred:#B20710;--black:#141414;--gray:#f5f5f5;--mid:#6b6b6b;--line:#e4e4e4;--ok:#1f9d4c;--warn:#f5b301}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#0b0b0b;overflow:hidden;font-family:Inter,"Helvetica Neue",Arial,sans-serif;color:var(--black)}
+#stage{position:absolute;left:0;top:0;width:1280px;height:720px;transform-origin:0 0;background:#fff;overflow:hidden;box-shadow:0 0 60px rgba(229,9,20,.25)}
+h1,h2,h3{font-family:"Bebas Neue",Impact,"Arial Narrow",sans-serif;font-weight:400;letter-spacing:.5px}
+#bar{position:absolute;left:0;top:0;right:0;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;z-index:20;color:var(--black)}
+#brand{font-family:"Bebas Neue",Impact,sans-serif;font-size:26px;letter-spacing:1px}
+#brand b{color:var(--red);font-weight:400}
+#brand small{font-family:Inter,sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-left:10px;opacity:.6}
+#domchip{background:var(--red);color:#fff;font-weight:800;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:7px 14px;border-radius:30px;cursor:pointer;opacity:0;transition:.3s}
+#domchip.show{opacity:1}
+#domchip:hover{background:var(--black)}
+#stage.dark #bar{color:#fff}
+#prog{position:absolute;left:0;bottom:0;height:6px;background:var(--red);width:0;transition:width .4s;z-index:25}
+#count{position:absolute;right:48px;bottom:18px;font-size:12px;font-weight:600;color:var(--mid);z-index:25;letter-spacing:1px}
+#stage.dark #count{color:#bbb}
+.slide{position:absolute;inset:0;padding:74px 64px 52px;background:#fff;opacity:0;visibility:hidden;transition:opacity .45s;overflow:hidden}
+.slide.active{opacity:1;visibility:visible}
+.slide.dark{color:#fff;background:var(--black)}
+.hero{background:var(--img) center/cover,linear-gradient(135deg,#B20710,#141414)}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,rgba(10,10,10,.96) 0%,rgba(10,10,10,.84) 50%,rgba(178,7,16,.6) 100%)}
+.hero>*{position:relative}
+.k{color:var(--red);font-weight:800;font-size:14px;letter-spacing:4px;text-transform:uppercase;margin-bottom:6px}
+h1{font-size:58px;line-height:1;margin-bottom:14px}
+h1 em,h2 em{color:var(--red);font-style:normal}
+h2{font-size:32px;line-height:1.05;margin-bottom:8px}
+p{font-size:19px;line-height:1.4}
+.sub{color:var(--mid);font-size:18px;margin:-6px 0 14px}
+.dark .sub{color:#ccc}
+.step{opacity:0;transform:translateY(18px);transition:opacity .5s,transform .5s}
+.step.on{opacity:1;transform:none}
+tr.step{transform:none}
+.step.stag,.step.stag.on{opacity:1;transform:none}
+.stag>*{opacity:0;transform:translateY(14px);transition:opacity .35s,transform .35s}
+.stag.on>*{opacity:1;transform:none;transition-delay:calc(var(--i,0)*80ms)}
+.row{display:flex;gap:16px}
+.col{display:flex;flex-direction:column;gap:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.mt{margin-top:14px}.mt2{margin-top:22px}
+.center{text-align:center}
+.card{background:#fff;border:1px solid var(--line);border-left:6px solid var(--red);border-radius:10px;padding:12px 16px;box-shadow:0 6px 16px rgba(0,0,0,.07);font-size:17px;line-height:1.3}
+.card b{display:block;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:3px}
+.card small{display:block;color:var(--mid);font-size:15px;margin-top:3px;line-height:1.3}
+.blk{background:var(--black);color:#fff;border-color:var(--black);border-left-color:var(--red)}
+.blk small{color:#bbb}
+.red{background:var(--red);color:#fff;border-color:var(--red);border-left-color:var(--black)}
+.red b{color:#fff;opacity:.85}.red small{color:#ffd9dc}
+.dark .card{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);border-left-color:var(--red);color:#fff;box-shadow:none}
+.dark .card small{color:#ccc}
+.chip{display:inline-block;background:var(--black);color:#fff;border-radius:30px;padding:8px 16px;font-weight:600;font-size:16px}
+.chip.r{background:var(--red)}
+.chip.o{background:#fff;color:var(--black);border:2px solid var(--black)}
+.flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ar{color:var(--red);font-size:26px;font-weight:800}
+.box{background:var(--black);color:#fff;border-radius:10px;padding:11px 15px;font-weight:600;font-size:16px;text-align:center}
+.box.r{background:var(--red)}
+.box.w{background:#fff;color:var(--black);border:2px solid var(--black)}
+.big{font-family:"Bebas Neue",Impact,sans-serif;font-size:76px;line-height:.9;color:var(--red)}
+.quote{background:var(--black);color:#fff;border-left:8px solid var(--red);border-radius:6px;padding:14px 22px;font-size:19px;line-height:1.35}
+.quote b{color:var(--red)}
+.concept{background:linear-gradient(90deg,var(--red),var(--dred));color:#fff;border-radius:10px;padding:13px 22px;font-size:20px;font-weight:800;text-align:center}
+.ul{list-style:none}
+.ul li{padding:4px 0 4px 26px;position:relative;font-size:17px;line-height:1.28}
+.ul li::before{content:"";position:absolute;left:4px;top:10px;width:10px;height:10px;background:var(--red);border-radius:2px}
+.ul.ok li::before{content:"✓";background:none;color:var(--red);font-weight:800;top:3px;width:auto;height:auto;font-size:17px}
+.tbl{width:100%;border-collapse:collapse;font-size:17px}
+.tbl th{background:var(--black);color:#fff;text-align:left;padding:9px 12px;font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase}
+.tbl td{padding:8px 12px;border-bottom:1px solid var(--line)}
+.tbl tr:nth-child(even) td{background:var(--gray)}
+.tbl td.c,.tbl th.c{text-align:center;white-space:nowrap}
+.tbl tr.tot td{background:var(--red);color:#fff;font-weight:800}
+.photo{background:var(--img) center/cover,linear-gradient(160deg,#B20710,#141414);border-radius:12px;position:relative;min-height:360px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.photo::after{content:"";position:absolute;inset:0;border-radius:12px;background:linear-gradient(180deg,transparent 55%,rgba(20,20,20,.75))}
+.photo span{position:absolute;left:16px;bottom:14px;z-index:2;color:#fff;font-family:"Bebas Neue",Impact,sans-serif;font-size:26px;line-height:1}
+.hint{font-size:14px;color:var(--mid)}
+.dark .hint{color:#aaa}
+.src{display:inline-block;font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:3px 9px;border-radius:20px;background:var(--gray);color:var(--black);border:1px solid var(--line);margin-right:4px}
+.src.pm{background:var(--red);color:#fff;border-color:var(--red)}
+.src.pr{background:var(--black);color:#fff;border-color:var(--black)}
+.src.so{background:#fff;color:var(--black);border:2px solid var(--black)}
+/* ruta */
+.route{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.route button{all:unset;cursor:pointer;background:var(--gray);border-radius:12px;padding:10px 12px;border-top:6px solid var(--black);transition:.2s;min-height:112px}
+.route button:hover{background:var(--black);color:#fff;transform:translateY(-3px)}
+.route button .n{font-family:"Bebas Neue",Impact,sans-serif;font-size:38px;line-height:.9;color:var(--red)}
+.route button h3{font-size:22px;margin:2px 0 3px}
+.route button p{font-size:14px;line-height:1.3;color:var(--mid)}
+.route button:hover p{color:#ccc}
+.route button.r{border-top-color:var(--red)}
+/* orbit */
+.orbit{position:relative;height:440px;margin-top:2px}
+.orbit .ctr{position:absolute;left:50%;top:50%;width:184px;height:184px;margin:-92px 0 0 -92px;border-radius:50%;background:radial-gradient(circle,var(--red),var(--dred));color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-family:"Bebas Neue",Impact,sans-serif;font-size:24px;line-height:1.05;padding:28px;box-shadow:0 0 0 12px rgba(229,9,20,.15),0 0 0 28px rgba(229,9,20,.07)}
+.orbit .nd{position:absolute;width:236px;height:84px;margin:-42px 0 0 -118px;background:var(--black);color:#fff;border-radius:10px;border-left:6px solid var(--red);padding:9px 12px;box-shadow:0 8px 18px rgba(0,0,0,.25);cursor:pointer}
+.orbit .nd:hover{background:var(--dred)}
+.orbit .nd b{font-family:"Bebas Neue",Impact,sans-serif;font-weight:400;font-size:18px;display:block;white-space:nowrap}
+.orbit .nd b i{color:var(--red);font-style:normal;margin-right:6px}
+.orbit .nd:hover b i{color:#fff}
+.orbit .nd span{font-size:13px;color:#ccc;line-height:1.2;display:block}
+/* timeline */
+.tl{position:relative;display:flex;justify-content:space-between;margin-top:30px;padding:0 6px}
+.tl::before{content:"";position:absolute;left:0;right:0;top:19px;height:4px;background:var(--black)}
+.tl .m{position:relative;width:208px;text-align:center;font-weight:600;font-size:16px}
+.tl .m::before{content:"";display:block;width:32px;height:32px;background:var(--black);transform:rotate(45deg);margin:3px auto 20px;border:4px solid #fff;box-shadow:0 0 0 3px var(--black)}
+.tl .m.hot::before{background:var(--red);box-shadow:0 0 0 3px var(--red)}
+.tl .m h3{font-size:26px;margin-bottom:4px}
+.tl .m.hot h3{color:var(--red)}
+.tl .m small{display:block;color:var(--mid);font-weight:400;font-size:14px;line-height:1.3}
+/* W5HH */
+.w5{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.w5 button{all:unset;cursor:pointer;background:var(--black);color:#fff;border-radius:10px;padding:12px 10px;text-align:center;border-bottom:5px solid var(--red);transition:.2s}
+.w5 button:hover,.w5 button.on{background:var(--red);border-bottom-color:var(--black)}
+.w5 button .t{font-family:"Bebas Neue",Impact,sans-serif;font-size:30px;line-height:1}
+.w5 button small{display:block;font-size:13px;opacity:.85;margin-top:2px}
+.w5ans{margin-top:16px;background:var(--gray);border-left:8px solid var(--red);border-radius:10px;padding:16px 22px;min-height:132px}
+.w5ans h3{font-size:28px;margin-bottom:6px}
+.w5ans p{font-size:18px}
+.w5ans .ex{margin-top:8px;font-size:16px;color:var(--mid)}
+.w5ans .ex b{color:var(--red)}
+/* WBS */
+.wbs{display:flex;flex-direction:column;align-items:center}
+.wbs .root{background:var(--red);color:#fff;font-family:"Bebas Neue",Impact,sans-serif;font-size:26px;padding:8px 28px;border-radius:10px;position:relative}
+.wbs .root::after{content:"";position:absolute;left:50%;bottom:-18px;width:3px;height:18px;background:var(--black)}
+.wbs .lv2{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;width:100%;margin-top:36px;position:relative}
+.wbs .lv2::before{content:"";position:absolute;left:10%;right:10%;top:-18px;height:3px;background:var(--black)}
+.wbs .br{position:relative}
+.wbs .br::before{content:"";position:absolute;left:50%;top:-18px;width:3px;height:18px;background:var(--black)}
+.wbs .h{background:var(--black);color:#fff;border-radius:8px;padding:8px 10px;font-weight:800;font-size:15px;text-align:center}
+.wbs .h i{color:var(--red);font-style:normal;margin-right:4px}
+.wbs .wp{background:var(--gray);border-left:4px solid var(--red);border-radius:6px;padding:6px 10px;font-size:14px;margin-top:6px}
+.wbs .wp i{font-style:normal;color:var(--mid);font-size:12px;margin-right:4px}
+/* PERT / COCOMO calculators */
+.calc{display:grid;grid-template-columns:1fr 430px;gap:28px;align-items:start}
+.sl{display:grid;grid-template-columns:150px 1fr 70px;align-items:center;gap:14px;height:52px;border-bottom:1px solid var(--line);font-weight:600;font-size:17px}
+.sl output{font-family:"Bebas Neue",Impact,sans-serif;font-size:30px;color:var(--red);text-align:right}
+input[type=range]{width:100%;accent-color:var(--red);cursor:pointer;height:22px}
+.out{background:var(--black);color:#fff;border-radius:12px;border-left:8px solid var(--red);padding:14px 20px}
+.out .lbl{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#bbb;font-weight:800}
+.out .v{font-family:"Bebas Neue",Impact,sans-serif;font-size:54px;line-height:1;color:var(--red)}
+.out .v small{font-size:24px;color:#fff;margin-left:6px}
+.out .ln{font-size:15px;color:#ddd;line-height:1.5;margin-top:6px}
+.out .ln b{color:#fff}
+.formula{background:var(--gray);border:2px dashed var(--line);border-radius:10px;padding:10px 16px;font-size:18px;font-weight:600;font-family:"Courier New",monospace;text-align:center}
+.formula em{color:var(--red);font-style:normal}
+.scaleline{position:relative;height:66px;margin-top:16px}
+.scaleline::before{content:"";position:absolute;left:0;right:0;top:30px;height:4px;background:var(--line);border-radius:2px}
+.scaleline .band{position:absolute;top:24px;height:16px;background:rgba(229,9,20,.18);border-radius:8px;transition:.3s}
+.scaleline .mk{position:absolute;top:0;transform:translateX(-50%);text-align:center;font-size:12px;font-weight:800;transition:.3s}
+.scaleline .mk::after{content:"";display:block;width:14px;height:14px;border-radius:50%;background:var(--black);margin:4px auto 0;border:3px solid #fff;box-shadow:0 0 0 2px var(--black)}
+.scaleline .mk.e{color:var(--red)}
+.scaleline .mk.e::after{background:var(--red);box-shadow:0 0 0 2px var(--red)}
+.modes{display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.modes span{font-weight:600;font-size:15px;color:var(--mid);margin-right:4px}
+.pill{background:#fff;border:2px solid var(--black);color:var(--black);border-radius:30px;padding:7px 16px;font:700 14px Inter,Arial,sans-serif;cursor:pointer;transition:.2s}
+.pill:hover{border-color:var(--red);color:var(--red)}
+.pill.on{background:var(--red);border-color:var(--red);color:#fff}
+/* gantt */
+.gantt{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.gr{display:grid;grid-template-columns:265px 1fr 64px;align-items:center;height:38px;border-bottom:1px solid var(--line)}
+.gr:last-child{border-bottom:0}
+.gr .lb{padding:0 12px;font-weight:600;font-size:14px;white-space:nowrap}
+.gr .lb i{font-style:normal;color:var(--red);font-weight:800;margin-right:6px}
+.gr .tr{position:relative;height:100%;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(100%/26 - 1px),#f0f0f0 calc(100%/26 - 1px),#f0f0f0 calc(100%/26))}
+.gr .bar{position:absolute;top:7px;height:24px;border-radius:5px;background:var(--black);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;padding-left:8px;transition:background .5s}
+.gr .sk{position:absolute;top:7px;height:24px;border:2px dashed var(--mid);border-left:0;border-radius:0 5px 5px 0}
+.gr .hd{font-size:12px;font-weight:800;color:#fff}
+.gr.head{background:var(--black);height:34px}
+.gr.head .tr{background:none}
+.gr.head .tk{position:absolute;top:9px;transform:translateX(-50%);color:#bbb;font-size:12px;font-weight:700}
+.gr .fl{text-align:center;font-weight:800;font-size:14px;color:var(--mid)}
+.gantt.lit .bar.crit{background:var(--red);box-shadow:0 0 12px rgba(229,9,20,.5)}
+.gantt.lit .fl.z{color:var(--red)}
+.dist{display:flex;height:40px;border-radius:8px;overflow:hidden;font-weight:800;font-size:14px;color:#fff}
+.dist div{display:flex;align-items:center;justify-content:center}
+/* ágil */
+.sprints{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;min-height:70px}
+.sp{width:70px;height:64px;background:var(--black);color:#fff;border-radius:8px;border-bottom:5px solid var(--red);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;font-size:13px;animation:pop .35s both}
+.sp b{font-family:"Bebas Neue",Impact,sans-serif;font-size:24px;font-weight:400;line-height:1}
+.sp.last{background:var(--red);border-bottom-color:var(--black)}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+/* RACI */
+.raci td.c{font-weight:800;font-size:17px}
+.raci .R{color:#fff;background:var(--black)!important}
+.raci .A{color:#fff;background:var(--red)!important}
+.raci .C{color:var(--black)}
+.raci .I{color:var(--mid)}
+/* presupuesto */
+.budget{display:flex;align-items:flex-end;gap:18px;height:330px;padding-bottom:4px;border-bottom:3px solid var(--black)}
+.bcol{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch;height:100%;text-align:center}
+.bcol .seg{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;border-radius:4px;margin-top:2px;padding:0 4px;line-height:1.1}
+.bcol .cap{font-family:"Bebas Neue",Impact,sans-serif;font-size:28px;color:var(--black);margin-bottom:4px}
+.blabels{display:flex;gap:18px;margin-top:8px}
+.blabels div{flex:1;text-align:center;font-weight:700;font-size:14px;line-height:1.2}
+/* valor ganado */
+.evk{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.evk .kp{background:var(--gray);border-radius:10px;padding:10px 14px;border-left:6px solid var(--mid)}
+.evk .kp .lbl{font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--mid)}
+.evk .kp .v{font-family:"Bebas Neue",Impact,sans-serif;font-size:40px;line-height:1}
+.evk .kp.good{border-left-color:var(--ok)}.evk .kp.good .v{color:var(--ok)}
+.evk .kp.bad{border-left-color:var(--red)}.evk .kp.bad .v{color:var(--red)}
+/* riesgos */
+.rk td.p{cursor:pointer;font-weight:800;color:var(--red);text-decoration:underline dotted}
+.rk td.p:hover{background:#ffe3e5!important}
+.rbar{height:14px;background:var(--red);border-radius:7px;transition:width .3s}
+/* cuadrante */
+.quad{display:grid;grid-template-columns:34px 1fr 1fr;grid-template-rows:auto 1fr 1fr;gap:10px;height:400px}
+.quad .qh{font-weight:800;font-size:13px;letter-spacing:2px;color:var(--mid);text-align:center;text-transform:uppercase}
+.quad .qv{writing-mode:vertical-rl;transform:rotate(180deg);font-weight:800;font-size:13px;letter-spacing:2px;color:var(--mid);text-align:center;text-transform:uppercase}
+.q{border-radius:12px;padding:12px 16px}
+.q h3{font-size:25px;margin-bottom:4px}
+.q p{font-size:15px;line-height:1.3}
+.q.a{background:var(--red);color:#fff}.q.b{background:var(--black);color:#fff}.q.c{background:var(--gray);border:2px solid var(--black)}.q.d{background:#fff;border:2px solid var(--line)}
+.q em{font-style:normal;display:inline-block;background:rgba(255,255,255,.22);padding:2px 10px;border-radius:20px;margin:6px 4px 0 0;font-size:14px;font-weight:600}
+.q.c em,.q.d em{background:var(--black);color:#fff}
+/* quiz */
+.qz{display:grid;grid-template-columns:260px 1fr;gap:24px;align-items:start}
+.qnav{display:flex;flex-direction:column;gap:5px}
+.qnav button{all:unset;cursor:pointer;background:var(--gray);border-radius:8px;padding:6px 12px;font-weight:600;font-size:15px;display:flex;gap:10px;align-items:center}
+.qnav button i{font-style:normal;width:26px;height:26px;border-radius:50%;background:var(--black);color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}
+.qnav button.sel{background:var(--black);color:#fff}
+.qnav button.sel i{background:var(--red)}
+.qnav button.ok i{background:var(--ok)}
+.qnav button.ko i{background:var(--red)}
+.qbox h3{font-size:30px;margin-bottom:12px;line-height:1.05}
+.qopt{display:flex;flex-direction:column;gap:8px}
+.qopt button{all:unset;cursor:pointer;border:2px solid var(--line);border-radius:10px;padding:11px 16px;font-size:17px;font-weight:600;transition:.2s}
+.qopt button:hover{border-color:var(--red)}
+.qopt button.right{background:var(--ok);border-color:var(--ok);color:#fff}
+.qopt button.wrong{background:var(--red);border-color:var(--red);color:#fff}
+.qfb{margin-top:12px;background:var(--black);color:#fff;border-left:8px solid var(--red);border-radius:8px;padding:11px 16px;font-size:16px;line-height:1.4;display:none}
+.qfb.show{display:block}
+.qfb b{color:var(--red)}
+.qscore{margin-top:14px;font-weight:800;font-size:15px;color:var(--mid);letter-spacing:1px;text-transform:uppercase}
+/* controles */
+#ctl{position:fixed;right:14px;bottom:12px;display:flex;gap:8px;z-index:50}
+#ctl button{background:rgba(20,20,20,.88);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:30px;padding:9px 16px;font:600 13px Inter,Arial,sans-serif;cursor:pointer;letter-spacing:.5px;transition:.2s}
+#ctl button:hover{background:var(--red)}
+#ctl .main{background:var(--red)}
+#ctl .main:hover{background:#fff;color:var(--black)}
+#hintbar{position:fixed;left:14px;bottom:14px;font-size:12px;color:#888;z-index:50}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.mbox{background:#fff;border-radius:16px;width:min(1060px,100%);max-height:94vh;overflow:auto;display:grid;grid-template-columns:290px 1fr;box-shadow:0 30px 80px rgba(0,0,0,.6);border-top:6px solid var(--red)}
+.mnav{background:var(--black);padding:18px 14px;display:flex;flex-direction:column;gap:6px}
+.mnav h3{font-size:26px;color:#fff;margin:0 6px 6px;letter-spacing:1px}
+.mnav h3 em{color:var(--red);font-style:normal}
+.mnav button{text-align:left;background:transparent;color:#ddd;border:0;border-radius:8px;padding:10px 12px;font:600 15px Inter,Arial,sans-serif;cursor:pointer;display:flex;gap:10px;align-items:center}
+.mnav button i{font-style:normal;width:24px;height:24px;border-radius:50%;background:#333;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none}
+.mnav button:hover{background:#2a2a2a}
+.mnav button.sel{background:var(--red);color:#fff}
+.mnav button.sel i{background:#fff;color:var(--red)}
+.mdet{padding:24px 32px 24px;position:relative}
+.mdet .x{position:absolute;right:16px;top:12px;background:none;border:0;font-size:30px;cursor:pointer;color:var(--mid)}
+.mdet .x:hover{color:var(--red)}
+.mdet .ico{font-size:42px;line-height:1}
+.mdet h2{font-size:46px;margin:4px 0 2px}
+.mdet .q1{color:var(--red);font-weight:800;font-size:19px;margin-bottom:10px}
+.mdet h4{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin:12px 0 4px}
+.mdet p{font-size:16px;line-height:1.45}
+.mdet .trio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:6px}
+.mdet .trio div{background:var(--gray);border-radius:8px;padding:10px 12px;font-size:14px;line-height:1.4}
+.mdet .trio div .src{margin-bottom:6px}
+.mdet .go{margin-top:16px;display:inline-block;background:var(--red);color:#fff;border:0;border-radius:30px;padding:10px 20px;font:700 14px Inter,Arial,sans-serif;cursor:pointer}
+.mdet .go:hover{background:var(--black)}
+.idx{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:22px;max-height:90vh;overflow:auto;background:#fff;border-radius:16px;border-top:6px solid var(--red);width:min(1000px,100%)}
+.idx h3{grid-column:1/-1;font-size:32px}
+.idx button{text-align:left;background:var(--gray);border:0;border-left:5px solid var(--red);border-radius:6px;padding:9px 12px;font:600 14px Inter,Arial,sans-serif;cursor:pointer}
+.idx button:hover{background:var(--black);color:#fff}
+.idx button i{font-style:normal;color:var(--red);font-weight:800;margin-right:6px}
+/* MoSCoW */
+.msc{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.mc{border-radius:10px;padding:8px 10px;background:var(--gray);border-top:6px solid var(--black)}
+.mc h3{font-size:19px;margin-bottom:6px}
+.mc.m{border-top-color:var(--red)}.mc.m h3{color:var(--red)}
+.mc.w{border-top-color:var(--mid);opacity:.85}
+.mc .st{background:#fff;border-radius:6px;padding:5px 8px;font-size:13px;font-weight:600;margin-top:5px;display:flex;justify-content:space-between;gap:6px;line-height:1.2}
+.mc .st i{font-style:normal;font-weight:800;color:#fff;background:var(--black);border-radius:10px;padding:1px 7px;font-size:12px;flex:none;align-self:center}
+.mc.m .st i{background:var(--red)}
+.mc .sum{margin-top:7px;font-weight:800;font-size:13px;text-align:right;color:var(--mid)}
+.mc.m .sum{color:var(--red)}
+.gr.hit .tr{background:none}
+.hmd{position:absolute;top:7px;width:13px;height:13px;margin-left:-6.5px;background:var(--red);transform:rotate(45deg)}
+.hml{position:absolute;top:24px;font-size:10.5px;font-weight:800;white-space:nowrap;color:var(--black)}
+/* glosario */
+abbr.gl{text-decoration:underline dotted var(--red) 2px;text-underline-offset:3px;cursor:help;font-style:normal}
+.dark abbr.gl,.blk abbr.gl,.red abbr.gl,.quote abbr.gl,.out abbr.gl,.box abbr.gl,.chip abbr.gl,.q.a abbr.gl,.q.b abbr.gl,.concept abbr.gl{text-decoration-color:#fff}
+#tip{position:fixed;z-index:90;max-width:340px;background:#fff;color:var(--black);border-top:4px solid var(--red);border-radius:8px;padding:9px 13px;box-shadow:0 12px 30px rgba(0,0,0,.35);font-size:13px;line-height:1.4;pointer-events:none;opacity:0;transition:opacity .15s}
+#tip.show{opacity:1}
+#tip b{font-family:"Bebas Neue",Impact,sans-serif;font-weight:400;font-size:22px;color:var(--red);margin-right:6px}
+#tip i{display:block;color:var(--mid);font-size:12px;margin-bottom:3px}
+.gbox{background:#fff;border-radius:16px;border-top:6px solid var(--red);width:min(1060px,100%);max-height:92vh;display:flex;flex-direction:column;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.ghead{display:flex;align-items:center;gap:16px;padding:18px 24px 10px}
+.ghead h3{font-family:"Bebas Neue",Impact,sans-serif;font-weight:400;font-size:38px;flex:none}
+.ghead h3 em{color:var(--red);font-style:normal}
+.ghead input{flex:1;border:2px solid var(--line);border-radius:30px;padding:10px 18px;font:600 15px Inter,Arial,sans-serif;outline:none}
+.ghead input:focus{border-color:var(--red)}
+.ghead .x{background:none;border:0;font-size:30px;cursor:pointer;color:var(--mid)}
+.ghead .x:hover{color:var(--red)}
+.gcats{display:flex;gap:8px;flex-wrap:wrap;padding:0 24px 12px;border-bottom:1px solid var(--line)}
+.gcats button{background:#fff;border:2px solid var(--black);border-radius:30px;padding:5px 13px;font:700 13px Inter,Arial,sans-serif;cursor:pointer}
+.gcats button.on{background:var(--red);border-color:var(--red);color:#fff}
+.glist{overflow:auto;padding:16px 24px 22px;display:grid;grid-template-columns:1fr 1fr;gap:10px;align-content:start}
+.ge{background:var(--gray);border-left:5px solid var(--red);border-radius:8px;padding:10px 14px;transition:box-shadow .3s,background .3s}
+.ge.flash{background:#ffe3e5;box-shadow:0 0 0 3px var(--red)}
+.ge .tt{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.ge .tt b{font-family:"Bebas Neue",Impact,sans-serif;font-weight:400;font-size:26px;color:var(--red);line-height:1}
+.ge .tt span{font-weight:800;font-size:15px}
+.ge .en{font-size:12px;color:var(--mid);font-style:italic;margin-top:1px}
+.ge p{font-size:14px;line-height:1.4;margin-top:4px}
+.ge .ft{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.ge .ct{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--mid)}
+.ge button{background:none;border:0;color:var(--red);font:800 13px Inter,Arial,sans-serif;cursor:pointer}
+.ge button:hover{text-decoration:underline}
+.gempty{grid-column:1/-1;color:var(--mid);text-align:center;padding:30px}
+.sgrid{display:grid;grid-template-columns:repeat(9,1fr);gap:7px}
+.sgrid button{all:unset;cursor:pointer;background:var(--gray);border-radius:8px;border-left:5px solid var(--red);padding:7px 10px;min-height:66px;transition:.2s}
+.sgrid button:hover{background:var(--black);color:#fff}
+.sgrid button b{display:block;font-family:"Bebas Neue",Impact,sans-serif;font-weight:400;font-size:25px;color:var(--red);line-height:1}
+.sgrid button span{display:block;font-size:11px;line-height:1.25;font-weight:600}
+@media(max-width:820px){.glist{grid-template-columns:1fr}.mbox{grid-template-columns:1fr}.mnav{flex-direction:row;flex-wrap:wrap}.idx{grid-template-columns:1fr}.mdet .trio{grid-template-columns:1fr}#hintbar{display:none}}
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <div id="bar">
+    <div id="brand"><b>PLANEACIÓN</b> DE PROYECTOS<small>Software · Enfoque PMI</small></div>
+    <div id="domchip" title="Abrir la guía de este dominio"></div>
+  </div>
+
+<!-- 1 PORTADA -->
+<section class="slide dark hero" data-title="Portada" style="--img:url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1920&q=80')">
+  <div class="k" style="margin-top:20px">Proyectos de software · Enfoque PMI</div>
+  <h1 style="font-size:104px;line-height:.9;margin:4px 0 10px">PLANEACIÓN<br>DE <em>PROYECTOS</em></h1>
+  <h2 style="font-size:32px;color:#fff;margin-bottom:16px">Guía paso a paso desde PMBOK 8, Pressman y Sommerville</h2>
+  <div class="flow step stag" style="gap:12px">
+    <span class="chip o" style="background:transparent;color:#fff;border-color:#fff">ENTENDER</span><span class="ar">→</span>
+    <span class="chip r">DEFINIR</span><span class="ar">→</span>
+    <span class="chip r">ESTIMAR</span><span class="ar">→</span>
+    <span class="chip r">PROGRAMAR</span><span class="ar">→</span>
+    <span class="chip r">ANTICIPAR</span><span class="ar">→</span>
+    <span class="chip" style="background:#fff;color:var(--red)">CONTROLAR</span>
+  </div>
+  <div class="g3 step stag mt2" style="max-width:980px">
+    <div class="card"><b>PMBOK 8 · PMI</b>Principios, dominios de desempeño y áreas de enfoque</div>
+    <div class="card"><b>Roger S. Pressman</b>Las 4P, W5HH, estimación y riesgos RMMM</div>
+    <div class="card"><b>Ian Sommerville</b>Planeación dirigida por plan y ágil, calendarización y riesgos</div>
+  </div>
+</section>
+
+<!-- 2 RUTA -->
+<section class="slide" data-title="Ruta de aprendizaje">
+  <div class="k">Mapa de la guía</div>
+  <h1>Ruta de <em>aprendizaje</em></h1>
+  <p class="sub">Tres bases y nueve pasos de planeación. Haz clic en cualquiera para ir a ella. Las siglas subrayadas muestran su significado; el glosario completo se abre con la tecla <b>L</b>.</p>
+  <div class="route step stag">
+    <button onclick="jump(3)"><div class="n">A</div><h3>Fundamentos</h3><p>Proyecto, planeación e incertidumbre</p></button>
+    <button onclick="jump(5)"><div class="n">B</div><h3>Tres marcos</h3><p>PMBOK 8, Pressman y Sommerville</p></button>
+    <button onclick="jump(11)"><div class="n">C</div><h3>Enfoque</h3><p>Predictivo, ágil o híbrido</p></button>
+    <button class="r" onclick="jump(12)"><div class="n">1</div><h3>Iniciar</h3><p>Acta e interesados</p></button>
+    <button class="r" onclick="jump(14)"><div class="n">2</div><h3>Alcance</h3><p>Requisitos, MoSCoW y EDT</p></button>
+    <button class="r" onclick="jump(16)"><div class="n">3</div><h3>Estimar</h3><p>Descomposición, PERT y COCOMO II</p></button>
+    <button class="r" onclick="jump(20)"><div class="n">4</div><h3>Programar</h3><p>Ruta crítica, hitos y sprints</p></button>
+    <button class="r" onclick="jump(22)"><div class="n">5</div><h3>Recursos</h3><p>Equipo y matriz RACI</p></button>
+    <button class="r" onclick="jump(23)"><div class="n">6</div><h3>Costos</h3><p>Presupuesto, reservas y valor ganado</p></button>
+    <button class="r" onclick="jump(25)"><div class="n">7</div><h3>Calidad</h3><p>Criterios, pruebas y esfuerzo</p></button>
+    <button class="r" onclick="jump(26)"><div class="n">8</div><h3>Riesgos</h3><p>Identificar, analizar y responder</p></button>
+    <button class="r" onclick="jump(28)"><div class="n">9</div><h3>Integrar</h3><p>Líneas base, cambios y plan</p></button>
+  </div>
+  <div class="quote step mt2">Caso guía de toda la presentación: <b>UniCafé</b>, una app móvil para pedir y pagar en la cafetería de la universidad.</div>
+</section>
+
+<!-- 3 DEFINICIONES -->
+<section class="slide" data-title="¿Qué es planear un proyecto?">
+  <div class="k">Fundamentos</div>
+  <h1>¿Qué es <em>planear</em> un proyecto?</h1>
+  <div class="g2" style="grid-template-columns:1fr 1fr;gap:26px">
+    <div class="col">
+      <div class="card step"><b>Proyecto</b>Esfuerzo <u>temporal</u> que se emprende para crear un producto, servicio o resultado <u>único</u>.<small>Tiene inicio y fin; no es una operación repetitiva.</small></div>
+      <div class="card step"><b>Planear</b>Decidir antes de actuar <u>qué</u> se hará, <u>cómo</u>, <u>cuándo</u>, <u>con quién</u>, <u>con cuánto</u> y <u>qué podría salir mal</u>.</div>
+      <div class="card blk step"><b>Plan de proyecto</b>Documento vivo que integra esas decisiones y sirve de base para ejecutar, comunicar y controlar.</div>
+    </div>
+    <div class="step">
+      <h2 style="font-size:26px">La incertidumbre se reduce al avanzar</h2>
+      <svg viewBox="0 0 520 260" width="100%" style="display:block">
+        <polygon points="40,20 500,118 500,142 40,240" fill="rgba(229,9,20,.14)" stroke="#E50914" stroke-width="2"/>
+        <line x1="40" y1="130" x2="500" y2="130" stroke="#141414" stroke-width="2" stroke-dasharray="6 5"/>
+        <g font-family="Inter,Arial" font-size="13" font-weight="700" fill="#141414">
+          <text x="44" y="16">×4</text><text x="44" y="256">×0,25</text>
+          <text x="40" y="150" fill="#6b6b6b">Idea</text><text x="170" y="150" fill="#6b6b6b">Requisitos</text><text x="320" y="150" fill="#6b6b6b">Diseño</text><text x="452" y="168" fill="#6b6b6b">Entrega</text>
+        </g>
+        <g fill="#E50914"><circle cx="40" cy="130" r="6"/><circle cx="190" cy="130" r="6"/><circle cx="340" cy="130" r="6"/><circle cx="500" cy="130" r="6"/></g>
+      </svg>
+      <p class="hint">Cono de incertidumbre: al inicio una estimación puede alejarse mucho del valor real; con cada fase se vuelve más precisa. Por eso el plan se actualiza.</p>
+    </div>
+  </div>
+  <div class="concept step mt">Planear no es adivinar el futuro: es reducir la incertidumbre y preparar respuestas</div>
+</section>
+
+<!-- 4 POR QUÉ ES DIFÍCIL -->
+<section class="slide" data-title="¿Por qué es difícil planear software?">
+  <div class="k">Fundamentos</div>
+  <h1>¿Por qué es difícil planear <em>software</em>?</h1>
+  <div class="g2" style="gap:26px">
+    <div class="step">
+      <p style="margin-bottom:10px"><span class="src so">Sommerville</span> El software se diferencia de otras ingenierías:</p>
+      <div class="col" style="gap:9px">
+        <div class="card"><b>Es intangible</b>No se puede ver ni tocar el avance; hay que depender de documentos y demos.</div>
+        <div class="card"><b>Suele ser único</b>Muchos proyectos son distintos a los anteriores; la experiencia previa no siempre aplica.</div>
+        <div class="card"><b>Los procesos varían</b>Cada organización trabaja distinto; no hay un proceso universal que garantice el resultado.</div>
+      </div>
+    </div>
+    <div class="step">
+      <p style="margin-bottom:10px"><span class="src pr">Pressman</span> Causas frecuentes de retrasos:</p>
+      <ul class="ul" style="background:var(--gray);border-radius:10px;padding:12px 16px">
+        <li>Fechas límite poco realistas impuestas desde afuera</li>
+        <li>Requisitos que cambian sin ajustar el plan</li>
+        <li>Subestimación honesta del esfuerzo necesario</li>
+        <li>Riesgos que no se consideraron al inicio</li>
+        <li>Dificultades técnicas imprevistas</li>
+        <li>Problemas humanos y de comunicación en el equipo</li>
+        <li>Falta de reconocimiento oportuno del atraso</li>
+      </ul>
+    </div>
+  </div>
+  <div class="quote step mt2">Casi todas estas causas son <b>problemas de planeación</b>, no de programación.</div>
+</section>
+
+<!-- 5 TRES MIRADAS -->
+<section class="slide" data-title="Tres miradas, un mismo objetivo">
+  <div class="k">Los tres marcos de referencia</div>
+  <h1>Tres miradas, <em>un mismo objetivo</em></h1>
+  <div class="g3 step stag" style="gap:18px">
+    <div class="card red" style="padding:16px 20px"><h2 style="color:#fff">PMBOK 8</h2><p style="font-size:14px;opacity:.9;margin-bottom:6px">PMI · estándar de dirección de proyectos</p>
+      <ul class="ul" style="color:#fff"><li>6 principios</li><li>7 dominios de desempeño</li><li>5 áreas de enfoque con 40 procesos adaptables</li><li>Aplica a cualquier industria</li></ul></div>
+    <div class="card blk" style="padding:16px 20px"><h2>PRESSMAN</h2><p style="font-size:14px;opacity:.8;margin-bottom:6px">Ingeniería del software · enfoque práctico</p>
+      <ul class="ul" style="color:#fff"><li>Espectro de las 4P</li><li>Principio W5HH</li><li>Estimación por descomposición y modelos empíricos</li><li>Riesgos con RMMM</li></ul></div>
+    <div class="card" style="padding:16px 20px"><h2>SOMMERVILLE</h2><p style="font-size:14px;color:var(--mid);margin-bottom:6px">Ingeniería del software · gestión del proyecto</p>
+      <ul class="ul"><li>Planeación dirigida por plan vs. ágil</li><li>Calendarización y diagramas de barras</li><li>COCOMO II y estimación</li><li>Riesgos de proyecto, producto y negocio</li></ul></div>
+  </div>
+  <div class="concept step mt2">PMBOK dice <u>qué</u> gestionar · Pressman y Sommerville muestran <u>cómo</u> aplicarlo al software</div>
+</section>
+
+<!-- 6 PRINCIPIOS -->
+<section class="slide" data-title="PMBOK 8: seis principios">
+  <div class="k">PMBOK 8 · La forma de pensar</div>
+  <h1>Seis <em>principios</em></h1>
+  <div class="g3 step stag" style="gap:14px">
+    <div class="card"><b>1 · Visión holística</b>Ver el proyecto como parte de un sistema mayor.<small>UniCafé afecta caja, inventario, TI y estudiantes.</small></div>
+    <div class="card"><b>2 · Enfoque en el valor</b>El éxito se mide por resultados, no solo por entregables.<small>Menos filas en la cafetería, no “una app terminada”.</small></div>
+    <div class="card"><b>3 · Calidad incorporada</b>La calidad se diseña desde el inicio, no se inspecciona al final.<small>Criterios de aceptación y pruebas desde el sprint 1.</small></div>
+    <div class="card"><b>4 · Liderazgo responsable</b>Dar claridad, generar confianza y responder por los resultados.<small>El líder rinde cuentas y apoya al equipo.</small></div>
+    <div class="card"><b>5 · Sostenibilidad integrada</b>Considerar impactos ambientales, sociales y económicos.<small>Menos papel en tickets, infraestructura eficiente.</small></div>
+    <div class="card"><b>6 · Cultura empoderada</b>Colaboración, seguridad psicológica y autonomía.<small>El equipo puede decir “esto no alcanza” sin miedo.</small></div>
+  </div>
+  <div class="quote step mt2">Los principios guían el <b>comportamiento</b>; los dominios definen <b>qué se gestiona</b>. Nombres en traducción libre al español.</div>
+</section>
+
+<!-- 7 ORBITA -->
+<section class="slide" data-title="PMBOK 8: siete dominios">
+  <div class="k">PMBOK 8 · Dominios de desempeño</div>
+  <h1 style="margin-bottom:0">Siete dominios, <em>un solo sistema</em></h1>
+  <div class="orbit" id="orbit">
+    <div class="ctr step">PLAN DEL PROYECTO DE SOFTWARE</div>
+  </div>
+  <p class="hint step center" style="margin-top:-6px">Haz clic en un dominio para ver qué dicen PMBOK 8, Pressman y Sommerville sobre él.</p>
+</section>
+
+<!-- 8 ÁREAS DE ENFOQUE -->
+<section class="slide" data-title="PMBOK 8: cinco áreas de enfoque">
+  <div class="k">PMBOK 8 · Áreas de enfoque</div>
+  <h1>¿Dónde está la <em>planificación</em>?</h1>
+  <p class="sub">PMBOK 8 organiza 40 procesos adaptables en cinco áreas de enfoque. No son fases rígidas: se repiten y se superponen.</p>
+  <div class="tl step stag">
+    <div class="m"><h3>Inicio</h3><small>Alinear con la estrategia, acta de constitución e identificación de interesados</small></div>
+    <div class="m hot"><h3>Planificación</h3><small>Alcance, cronograma, costos, riesgos, calidad, adquisiciones y recursos en un plan coherente</small></div>
+    <div class="m"><h3>Ejecución</h3><small>Realizar el trabajo, coordinar al equipo y gestionar el compromiso</small></div>
+    <div class="m"><h3>Monitoreo y control</h3><small>Comparar avance contra el plan y ajustar</small></div>
+    <div class="m"><h3>Cierre</h3><small>Aceptación, entrega, lecciones aprendidas y beneficios</small></div>
+  </div>
+  <div class="g2 step mt2" style="margin-top:34px">
+    <div class="card"><b>Planificación iterativa</b>Se vuelve a planear cada vez que cambian las condiciones: nuevos requisitos, riesgos o datos reales de avance.</div>
+    <div class="card blk"><b>Conexión con el software</b>En un enfoque ágil, la planificación ocurre en cada release y en cada sprint; en uno predictivo, se concentra al inicio y se ajusta con control de cambios.</div>
+  </div>
+</section>
+
+<!-- 9 LAS 4P -->
+<section class="slide" data-title="Pressman: las 4P">
+  <div class="k">Pressman · Espectro de la gestión</div>
+  <h1>Las <em>4P</em> de la gestión de proyectos</h1>
+  <div class="g4 step stag" style="gap:14px">
+    <div class="card red" style="padding:16px"><h2 style="color:#fff;font-size:40px">PERSONAS</h2><p style="font-size:16px">Patrocinadores, líderes, equipo y usuarios. Para Pressman es el factor <strong>más importante</strong>.</p><small style="margin-top:8px">UniCafé: 1 líder, 2 desarrolladores, 1 QA/UX</small></div>
+    <div class="card" style="padding:16px"><h2 style="font-size:40px">PRODUCTO</h2><p style="font-size:16px">Antes de planear hay que entender el alcance y descomponer el problema.</p><small style="margin-top:8px">Menú, carrito, pago, notificación, panel de caja</small></div>
+    <div class="card" style="padding:16px"><h2 style="font-size:40px">PROCESO</h2><p style="font-size:16px">El marco de actividades elegido: comunicación, planeación, modelado, construcción y despliegue.</p><small style="margin-top:8px">Proceso iterativo con sprints de 2 semanas</small></div>
+    <div class="card blk" style="padding:16px"><h2 style="font-size:40px">PROYECTO</h2><p style="font-size:16px">Planear, monitorear y controlar el trabajo para evitar retrasos y sobrecostos.</p><small style="margin-top:8px">Cronograma, presupuesto, riesgos y seguimiento</small></div>
+  </div>
+  <div class="flow step stag mt2" style="justify-content:center">
+    <span class="box r">PERSONAS</span><span class="ar">→</span><span class="box">PRODUCTO</span><span class="ar">→</span><span class="box">PROCESO</span><span class="ar">→</span><span class="box w">PROYECTO</span>
+  </div>
+  <p class="hint step center mt">Relación con PMBOK 8: Personas ↔ Recursos e Interesados · Producto ↔ Alcance · Proceso ↔ Enfoque de desarrollo · Proyecto ↔ Gobernanza, Cronograma, Finanzas y Riesgo</p>
+</section>
+
+<!-- 10 W5HH -->
+<section class="slide" data-title="Pressman: principio W5HH">
+  <div class="k">Pressman · Principio W5HH (Boehm)</div>
+  <h1>Siete preguntas para un <em>plan mínimo</em></h1>
+  <div class="w5 nonav" id="w5"></div>
+  <div class="w5ans nonav" id="w5ans"></div>
+  <p class="hint mt">Haz clic en cada pregunta. Si un plan no responde las siete, todavía tiene huecos.</p>
+</section>
+
+<!-- 11 ENFOQUES -->
+<section class="slide" data-title="Predictivo, ágil o híbrido">
+  <div class="k">Sommerville · PMBOK 8 · Enfoque de desarrollo</div>
+  <h1>Predictivo, ágil o <em>híbrido</em></h1>
+  <table class="tbl" style="font-size:16px"><thead><tr><th style="width:180px">Aspecto</th><th>Predictivo · dirigido por plan</th><th>Adaptativo · ágil</th><th>Híbrido</th></tr></thead><tbody>
+    <tr class="step"><td><b>Requisitos</b></td><td>Estables y definidos al inicio</td><td>Evolucionan; backlog priorizado</td><td>Base estable + detalle iterativo</td></tr>
+    <tr class="step"><td><b>Planificación</b></td><td>Detallada al inicio; se controla contra la línea base</td><td>Por release y por iteración</td><td>Hitos fijos, trabajo en sprints</td></tr>
+    <tr class="step"><td><b>Entregas</b></td><td>Una entrega final</td><td>Incrementos frecuentes</td><td>Incrementos con hitos formales</td></tr>
+    <tr class="step"><td><b>Cambios</b></td><td>Control formal de cambios</td><td>Se esperan y se reprioriza</td><td>Formal en lo contractual, flexible en lo funcional</td></tr>
+    <tr class="step"><td><b>Ideal para</b></td><td>Sistemas críticos o regulados, contratos de precio fijo</td><td>Productos con incertidumbre y usuario disponible</td><td>Organizaciones que necesitan ambos</td></tr>
+  </tbody></table>
+  <div class="concept step mt2">UniCafé usa un enfoque híbrido: acta, presupuesto e hitos formales + desarrollo en sprints</div>
+</section>
+
+<!-- 12 CASO / ACTA -->
+<section class="slide" data-dom="1" data-title="Paso 1: acta del proyecto">
+  <div class="k">Paso 1 · Iniciar · Gobernanza · Acta de constitución</div>
+  <h1>El caso <em>UniCafé</em></h1>
+  <div style="display:grid;grid-template-columns:1fr 300px;gap:26px">
+    <div class="g2 step stag" style="gap:12px">
+      <div class="card"><b>Problema</b>Filas de hasta 20 minutos en horas pico; pedidos perdidos y pagos lentos.</div>
+      <div class="card"><b>Objetivo</b>Reducir el tiempo de espera a menos de 5 minutos en el primer semestre de uso.</div>
+      <div class="card"><b>Alcance de alto nivel</b>App para pedir y pagar, panel para la cocina y la caja, reportes de ventas.</div>
+      <div class="card"><b>Fuera del alcance</b>Domicilios fuera del campus e integración con el sistema contable.</div>
+      <div class="card"><b>Restricciones</b>Entrega antes del inicio del semestre; presupuesto máximo aprobado.</div>
+      <div class="card"><b>Supuestos</b>La universidad provee servidor y la cafetería tiene conexión estable.</div>
+      <div class="card red"><b>Patrocinador</b>Dirección administrativa de la universidad</div>
+      <div class="card blk"><b>Líder del proyecto</b>Autoridad para asignar el equipo y gestionar el presupuesto</div>
+    </div>
+    <div class="photo step" style="--img:url('https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1200&q=80')"><span>El acta autoriza<br>el proyecto</span></div>
+  </div>
+  <div class="quote step mt">Sin acta no hay <b>autorización</b>, ni <b>objetivo medible</b>, ni <b>dueño</b> de las decisiones.</div>
+</section>
+
+<!-- 24 STAKEHOLDERS -->
+<section class="slide" data-dom="5" data-title="Paso 1: partes interesadas">
+  <div class="k">Paso 1 · Iniciar · Partes interesadas · Matriz poder-interés</div>
+  <h1>A quién <em>involucrar</em> y cómo</h1>
+  <div style="display:grid;grid-template-columns:1fr 350px;gap:24px">
+    <div class="quad">
+      <div></div><div class="qh">Interés bajo</div><div class="qh">Interés alto</div>
+      <div class="qv">Poder alto</div>
+      <div class="q c step"><h3>MANTENER SATISFECHO</h3><p>Consultar en decisiones clave.</p><em>Oficina de TI</em></div>
+      <div class="q a step"><h3>GESTIONAR DE CERCA</h3><p>Involucrar y decidir juntos.</p><em>Dirección administrativa</em><em>Concesionario</em></div>
+      <div class="qv">Poder bajo</div>
+      <div class="q d step"><h3>MONITOREAR</h3><p>Información general y oportuna.</p><em>Proveedor de pagos</em></div>
+      <div class="q b step"><h3>MANTENER INFORMADO</h3><p>Demos, encuestas y capacitación.</p><em>Estudiantes</em><em>Cajeros y cocina</em></div>
+    </div>
+    <div class="col" style="gap:10px">
+      <table class="tbl step" style="font-size:14px"><thead><tr><th>Interesado</th><th>Canal</th><th>Frecuencia</th></tr></thead><tbody>
+        <tr><td><b>Patrocinador</b></td><td>Informe de estado</td><td>Quincenal</td></tr>
+        <tr><td><b>Concesionario</b></td><td>Demo del sprint</td><td>Cada sprint</td></tr>
+        <tr><td><b>Cajeros</b></td><td>Taller práctico</td><td>Antes del lanzamiento</td></tr>
+        <tr><td><b>Estudiantes</b></td><td>Encuesta y redes</td><td>Mensual</td></tr>
+      </tbody></table>
+      <div class="card blk step"><b>Pressman · Personas</b>Los interesados son la primera P: un sistema que nadie usa no genera valor.</div>
+    </div>
+  </div>
+</section>
+
+<!-- REQUISITOS -->
+<section class="slide" data-dom="2" data-title="Paso 2: requisitos y priorización">
+  <div class="k">Paso 2 · Alcance · Requisitos · Sommerville y Pressman</div>
+  <h1>De necesidades a <em>requisitos</em></h1>
+  <div style="display:grid;grid-template-columns:380px 1fr;gap:24px;align-items:start">
+    <div class="col step stag" style="gap:7px;font-size:15px">
+      <div class="card" style="font-size:15px"><b>Obtención</b>Entrevistas al concesionario, observación en hora pico, encuesta a estudiantes y prototipo en papel.</div>
+      <div class="card" style="font-size:15px"><b>Requisito funcional</b>Qué hace el sistema.<small>El estudiante paga con tarjeta desde la app.</small></div>
+      <div class="card blk" style="font-size:15px"><b>Requisito no funcional</b>Cómo debe comportarse: rendimiento, seguridad, usabilidad.<small>Confirmación en menos de 3 s con 300 usuarios simultáneos.</small></div>
+      <div class="card red" style="font-size:15px"><b>Historia de usuario + criterio</b>“Como estudiante quiero pagar desde la app para no hacer fila.”<small>Criterio: el pago aprobado crea el pedido en cocina con un número visible.</small></div>
+    </div>
+    <div>
+      <p style="font-weight:600;font-size:17px;margin-bottom:8px">Priorización <b style="color:var(--red)">MoSCoW</b> del backlog (puntos de historia)</p>
+      <div class="msc step stag">
+        <div class="mc m"><h3>MUST · Debe</h3><div class="st">Ver menú y precios<i>5</i></div><div class="st">Hacer pedido<i>8</i></div><div class="st">Pagar en línea<i>13</i></div><div class="st">Panel de cocina y caja<i>8</i></div><div class="st">Reportes básicos de ventas<i>6</i></div><div class="sum">40 puntos</div></div>
+        <div class="mc s"><h3>SHOULD · Debería</h3><div class="st">Avisar “pedido listo”<i>5</i></div><div class="st">Historial de pedidos<i>3</i></div><div class="sum">8 puntos</div></div>
+        <div class="mc c"><h3>COULD · Podría</h3><div class="st">Productos favoritos<i>3</i></div><div class="st">Calificar productos<i>2</i></div><div class="sum">5 puntos</div></div>
+        <div class="mc w"><h3>WON’T · Esta vez no</h3><div class="st">Domicilios fuera del campus</div><div class="st">Integración contable</div><div class="st">Pago con código QR</div><div class="sum">Fuera del alcance</div></div>
+      </div>
+      <div class="concept step mt" style="font-size:17px;text-align:left">Los 40 puntos MUST son el backlog del release (lámina 21) y se reflejan en los paquetes de la EDT (lámina 15). Lo que queda en WON’T solo entra mediante control de cambios (lámina 28).</div>
+    </div>
+  </div>
+</section>
+
+<!-- 13 EDT -->
+<section class="slide" data-dom="2" data-title="Paso 2: EDT del alcance">
+  <div class="k">Paso 2 · Alcance · Estructura de desglose del trabajo</div>
+  <h1>Del enunciado a la <em>EDT</em></h1>
+  <div class="wbs step">
+    <div class="root">1.0 APP UNICAFÉ</div>
+    <div class="lv2 stag step">
+      <div class="br"><div class="h"><i>1.1</i>Gestión</div><div class="wp"><i>1.1.1</i>Plan del proyecto</div><div class="wp"><i>1.1.2</i>Seguimiento</div><div class="wp"><i>1.1.3</i>Cierre</div></div>
+      <div class="br"><div class="h"><i>1.2</i>Requisitos</div><div class="wp"><i>1.2.1</i>Entrevistas</div><div class="wp"><i>1.2.2</i>Historias de usuario</div><div class="wp"><i>1.2.3</i>Prototipo</div></div>
+      <div class="br"><div class="h"><i>1.3</i>Diseño</div><div class="wp"><i>1.3.1</i>Interfaz (UI)</div><div class="wp"><i>1.3.2</i>Base de datos</div><div class="wp"><i>1.3.3</i>Arquitectura</div></div>
+      <div class="br"><div class="h"><i>1.4</i>Construcción</div><div class="wp"><i>1.4.1</i>App móvil</div><div class="wp"><i>1.4.2</i>Backend y API</div><div class="wp"><i>1.4.3</i>Pagos</div></div>
+      <div class="br"><div class="h"><i>1.5</i>Pruebas y entrega</div><div class="wp"><i>1.5.1</i>Pruebas integrales</div><div class="wp"><i>1.5.2</i>Capacitación</div><div class="wp"><i>1.5.3</i>Despliegue</div></div>
+    </div>
+  </div>
+  <div class="g3 step stag mt2">
+    <div class="card"><b>Regla del 100 %</b>La EDT contiene todo el trabajo del proyecto, y nada más.</div>
+    <div class="card"><b>Paquete de trabajo</b>Último nivel: se puede estimar, asignar y controlar.</div>
+    <div class="card blk"><b>Línea base del alcance</b>Enunciado + EDT + diccionario de la EDT, aprobados.</div>
+  </div>
+</section>
+
+<!-- 14 TÉCNICAS DE ESTIMACIÓN -->
+<section class="slide" data-title="Paso 3: técnicas de estimación">
+  <div class="k">Paso 3 · Estimación · Pressman y Sommerville</div>
+  <h1>¿Cómo se <em>estima</em> el software?</h1>
+  <div class="g3 step stag" style="gap:14px">
+    <div class="card"><b>Analogía / juicio experto</b>Comparar con proyectos similares ya terminados.<small>Rápida; depende de tener historia confiable.</small></div>
+    <div class="card"><b>Descomposición</b>Estimar cada función o paquete de la EDT y sumar.<small>Pressman: por líneas de código (LOC) o por puntos de función (PF).</small></div>
+    <div class="card"><b>Tres puntos · PERT</b>Optimista, más probable y pesimista por actividad.<small>Incorpora la incertidumbre en el número.</small></div>
+    <div class="card red"><b>Modelo algorítmico</b>Ecuación calibrada con datos históricos.<small>COCOMO II, presentado por ambos autores.</small></div>
+    <div class="card blk"><b>Puntos de historia</b>Tamaño relativo de cada historia de usuario.<small>Se convierte en tiempo con la velocidad del equipo.</small></div>
+    <div class="card"><b>Puntos de casos de uso</b>Tamaño a partir de actores y escenarios.<small>Útil cuando los requisitos están en casos de uso.</small></div>
+  </div>
+  <div class="quote step mt2">Pressman recomienda <b>usar al menos dos técnicas</b> y comparar: si los resultados difieren mucho, falta información.</div>
+</section>
+
+<!-- DESCOMPOSICIÓN -->
+<section class="slide" data-title="Paso 3: descomposición">
+  <div class="k">Paso 3 · Estimación · Pressman · Descomposición por líneas de código</div>
+  <h1>Estimar por <em>descomposición</em></h1>
+  <div style="display:grid;grid-template-columns:1fr 390px;gap:26px;align-items:start">
+    <div>
+      <table class="tbl step" style="font-size:16px"><thead><tr><th>Función de UniCafé</th><th class="c">O</th><th class="c">M</th><th class="c">P</th><th class="c">E (LOC)</th></tr></thead><tbody>
+        <tr><td>Menú y catálogo</td><td class="c">500</td><td class="c">650</td><td class="c">1.100</td><td class="c"><b>700</b></td></tr>
+        <tr><td>Pedidos y carrito</td><td class="c">700</td><td class="c">950</td><td class="c">1.500</td><td class="c"><b>1.000</b></td></tr>
+        <tr><td>Pagos en línea</td><td class="c">800</td><td class="c">1.100</td><td class="c">2.000</td><td class="c"><b>1.200</b></td></tr>
+        <tr><td>Panel de cocina y caja</td><td class="c">750</td><td class="c">1.000</td><td class="c">1.250</td><td class="c"><b>1.000</b></td></tr>
+        <tr><td>Reportes de ventas</td><td class="c">300</td><td class="c">450</td><td class="c">900</td><td class="c"><b>500</b></td></tr>
+        <tr><td>Autenticación y seguridad</td><td class="c">600</td><td class="c">750</td><td class="c">1.200</td><td class="c"><b>800</b></td></tr>
+        <tr class="tot"><td>Total estimado</td><td></td><td></td><td></td><td class="c">5.200 LOC</td></tr>
+      </tbody></table>
+      <p class="hint step mt">Cada función se estima con tres puntos: E = (O + 4M + P) ÷ 6. Con puntos de función (PF) el proceso es igual, pero se cuentan entradas, salidas, consultas, archivos e interfaces en lugar de líneas.</p>
+    </div>
+    <div class="col" style="gap:10px">
+      <div class="card step"><b>Productividad histórica</b>1.000 LOC por persona-mes, medida en proyectos anteriores del mismo equipo.</div>
+      <div class="out step"><div class="lbl">Técnica 1 · Descomposición</div><div class="v">5,2<small>PM ≈ 832 h</small></div><div class="ln">5.200 LOC ÷ 1.000 LOC/PM × 160 h por mes</div></div>
+      <div class="card blk step"><b>Técnica 2 · Cronograma y equipo</b>4 personas × 26 días × 8 h = 832 h (láminas 20 y 22).</div>
+      <div class="concept step" style="font-size:16px">Las dos técnicas coinciden: 832 h es la base del presupuesto (lámina 23)</div>
+    </div>
+  </div>
+</section>
+
+<!-- 15 PERT -->
+<section class="slide" data-dom="3" data-title="Paso 3: estimación PERT">
+  <div class="k">Paso 3 · Estimación · Tres puntos por actividad</div>
+  <h1>Calculadora <em>PERT</em></h1>
+  <div class="calc nonav">
+    <div>
+      <p style="font-size:17px;margin-bottom:6px">Actividad: <b>1.4.1 Desarrollo de la app móvil</b> (días)</p>
+      <div class="sl"><span>Optimista (O)</span><input type="range" id="pO" min="1" max="30" value="7"><output id="vO">7</output></div>
+      <div class="sl"><span>Más probable (M)</span><input type="range" id="pM" min="1" max="30" value="10"><output id="vM">10</output></div>
+      <div class="sl"><span>Pesimista (P)</span><input type="range" id="pP" min="1" max="30" value="16"><output id="vP">16</output></div>
+      <div class="scaleline" id="pLine"></div>
+      <div class="formula">E = (<em>O</em> + 4·<em>M</em> + <em>P</em>) ÷ 6 &nbsp;&nbsp;·&nbsp;&nbsp; σ = (<em>P</em> − <em>O</em>) ÷ 6</div>
+    </div>
+    <div class="col">
+      <div class="out"><div class="lbl">Duración esperada</div><div class="v" id="pE">10,5<small>días</small></div><div class="ln" id="pTxt"></div></div>
+      <div class="card"><b>¿Por qué funciona?</b>Le da más peso al valor más probable, pero no ignora los extremos. Cuanto mayor es σ, más incierta es la actividad.</div>
+      <div class="card blk"><b>Conexión con el cronograma</b>Esta es la actividad D de la lámina 20. Allí se programa con 10 días; la estimación PERT de 10,5 días muestra que la ruta crítica no tiene margen.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 16 COCOMO -->
+<section class="slide" data-dom="4" data-title="Paso 3: COCOMO II">
+  <div class="k">Paso 3 · Estimación · Modelo algorítmico</div>
+  <h1>COCOMO II <em>simplificado</em></h1>
+  <div class="calc nonav">
+    <div>
+      <p style="font-size:17px;margin-bottom:6px">Ejemplo: sistema académico de 20 KLOC. Mueve el control a 5 KLOC para comparar con UniCafé.</p>
+      <div class="sl"><span>Tamaño (KLOC)</span><input type="range" id="cK" min="1" max="100" value="20"><output id="vK">20</output></div>
+      <div class="modes mt"><span>Factores de escala (E):</span>
+        <button class="pill" data-e="1.00">Conocido · 1,00</button>
+        <button class="pill on" data-e="1.10">Típico · 1,10</button>
+        <button class="pill" data-e="1.20">Novedoso · 1,20</button></div>
+      <div class="formula">Esfuerzo (PM) = <em>2,94</em> × Tamaño<sup><em>E</em></sup> × ΠMultiplicadores</div>
+      <div class="formula mt">Duración (meses) = <em>3,67</em> × PM<sup><em>0,28 + 0,2·(E − 0,91)</em></sup></div>
+      <p class="hint mt">Multiplicadores de esfuerzo = 1 (valor nominal). KLOC = miles de líneas de código. E crece con la novedad, el riesgo y la falta de madurez del proceso.</p>
+    </div>
+    <div class="col">
+      <div class="out"><div class="lbl">Esfuerzo estimado</div><div class="v" id="cPM">79<small>personas-mes</small></div><div class="ln" id="cTxt"></div></div>
+      <div class="card blk"><b>Lectura clave</b>El esfuerzo crece más rápido que el tamaño cuando E &gt; 1: duplicar el código <u>más</u> que duplica el esfuerzo (deseconomía de escala).</div>
+    </div>
+  </div>
+</section>
+
+<!-- 17 GANTT -->
+<section class="slide" data-dom="3" data-title="Paso 4: cronograma y ruta crítica">
+  <div class="k">Paso 4 · Cronograma · Red, hitos y diagrama de barras</div>
+  <h1>Ruta <em>crítica</em> de UniCafé</h1>
+  <div class="gantt" id="gantt"></div>
+  <div class="g2 mt" style="grid-template-columns:1.25fr 1fr;align-items:start">
+    <div class="quote step" data-lit="gantt">Ruta crítica: <b>A → B → D → F → G = 26 días</b>. Si cualquiera de estas actividades se atrasa un día, el proyecto se atrasa un día.</div>
+    <div class="card step"><b>Holgura</b>C y E pueden retrasarse hasta <u>3 días</u> sin mover la fecha final (línea punteada).</div>
+  </div>
+  <p class="hint step mt">Pressman: compartimentar, definir dependencias, asignar tiempo y responsables, y fijar hitos. Sommerville: representarlo en diagramas de actividades y de barras.</p>
+</section>
+
+<!-- 18 ÁGIL -->
+<section class="slide" data-dom="3" data-title="Paso 4: planeación ágil">
+  <div class="k">Paso 4 · Cronograma · Sommerville · planeación ágil</div>
+  <h1>Release, sprint y <em>velocidad</em></h1>
+  <div class="g2" style="grid-template-columns:1fr 1fr;gap:28px">
+    <div class="col">
+      <div class="flow step stag" style="gap:6px;flex-wrap:nowrap"><span class="box" style="font-size:14px;padding:9px 11px">BACKLOG</span><span class="ar">→</span><span class="box" style="font-size:14px;padding:9px 11px">RELEASE</span><span class="ar">→</span><span class="box r" style="font-size:14px;padding:9px 11px">SPRINT</span><span class="ar">→</span><span class="box w" style="font-size:14px;padding:9px 11px">INCREMENTO</span></div>
+      <div class="card step"><b>Planeación del release</b>¿Qué historias entran y en cuántos sprints, según la velocidad?</div>
+      <div class="card step"><b>Planeación del sprint</b>El equipo elige historias y las divide en tareas estimadas.</div>
+      <div class="card blk step"><b>Velocidad</b>Puntos de historia completados por sprint. Se mide, no se impone.</div>
+    </div>
+    <div class="nonav">
+      <p style="font-weight:600;font-size:17px">Backlog del release de UniCafé: <b style="color:var(--red)">40 puntos</b> · sprints de 2 semanas (10 días hábiles)</p>
+      <div class="modes mt"><span>Velocidad del equipo:</span><button class="pill" data-v="10">10</button><button class="pill on" data-v="15">15</button><button class="pill" data-v="20">20</button><button class="pill" data-v="25">25</button></div>
+      <div class="sprints" id="spr"></div>
+      <div class="out mt"><div class="lbl">Duración del release</div><div class="v" id="aV">3<small>sprints</small></div><div class="ln" id="aTxt"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 19 RACI -->
+<section class="slide" data-dom="6" data-title="Paso 5: recursos y RACI">
+  <div class="k">Paso 5 · Recursos · Asignación y responsabilidades</div>
+  <h1>¿Quién hace <em>qué</em>?</h1>
+  <table class="tbl raci step"><thead><tr><th>Actividad</th><th class="c">Patrocinador</th><th class="c">Líder</th><th class="c">Desarrolladores</th><th class="c">QA / UX</th><th class="c">Cafetería</th></tr></thead><tbody>
+    <tr><td>Aprobar el acta y el presupuesto</td><td class="c A">A</td><td class="c R">R</td><td class="c I">I</td><td class="c I">I</td><td class="c C">C</td></tr>
+    <tr><td>Definir historias de usuario</td><td class="c I">I</td><td class="c A">A</td><td class="c C">C</td><td class="c R">R</td><td class="c C">C</td></tr>
+    <tr><td>Construir app y backend</td><td class="c I">I</td><td class="c A">A</td><td class="c R">R</td><td class="c C">C</td><td class="c I">I</td></tr>
+    <tr><td>Ejecutar pruebas</td><td class="c I">I</td><td class="c A">A</td><td class="c C">C</td><td class="c R">R</td><td class="c C">C</td></tr>
+    <tr><td>Aceptar entregables</td><td class="c A">A</td><td class="c R">R</td><td class="c I">I</td><td class="c C">C</td><td class="c C">C</td></tr>
+    <tr><td>Capacitar al personal</td><td class="c I">I</td><td class="c A">A</td><td class="c C">C</td><td class="c R">R</td><td class="c C">C</td></tr>
+  </tbody></table>
+  <div class="g4 step stag mt" style="gap:12px">
+    <div class="card blk"><b>R · Responsable</b>Ejecuta el trabajo</div>
+    <div class="card red"><b>A · Aprobador</b>Rinde cuentas; solo uno por fila</div>
+    <div class="card"><b>C · Consultado</b>Aporta antes de decidir</div>
+    <div class="card"><b>I · Informado</b>Conoce el resultado</div>
+  </div>
+  <div class="quote step mt" style="font-size:16px"><b>Equipo de 4 personas al 100 %</b> asignado al cronograma: A → líder y QA/UX · B → QA/UX · C y E → desarrollador 2 · D → desarrollador 1 · F → todo el equipo · G → líder y desarrollador 1. Total: 832 h, base del presupuesto.</div>
+</section>
+
+<!-- 20 PRESUPUESTO -->
+<section class="slide" data-dom="4" data-title="Paso 6: presupuesto">
+  <div class="k">Paso 6 · Finanzas · Construcción del presupuesto</div>
+  <h1>Del esfuerzo al <em>presupuesto</em></h1>
+  <div style="display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:start">
+    <div class="step">
+      <div class="budget">
+        <div class="bcol"><div class="cap">$41,0 M</div><div class="seg" style="height:60%;background:var(--black)">Talento humano<br>$38,0 M</div><div class="seg" style="height:5%;background:#555">Nube y licencias $2,0 M</div><div class="seg" style="height:3%;background:#888;font-size:11px">Capacitación $1 M</div></div>
+        <div class="bcol"><div class="cap">$45,1 M</div><div class="seg" style="height:6.5%;background:var(--red)">Contingencia $4,1 M</div><div class="seg" style="height:68%;background:var(--black)">Estimación de costos $41,0 M</div></div>
+        <div class="bcol"><div class="cap" style="color:var(--red)">$47,2 M</div><div class="seg" style="height:3.3%;background:var(--dred);font-size:11px">Gestión $2,1 M</div><div class="seg" style="height:6.5%;background:var(--red)">Contingencia</div><div class="seg" style="height:68%;background:var(--black)">Estimación de costos</div></div>
+      </div>
+      <div class="blabels"><div>Estimación de costos<br><span class="hint">suma de paquetes de trabajo</span></div><div>Línea base de costos<br><span class="hint">+ reserva de contingencia (10 %)</span></div><div>Presupuesto total<br><span class="hint">+ reserva de gestión (5 %)</span></div></div>
+    </div>
+    <div class="col">
+      <div class="card step"><b>Reserva de contingencia</b>Para riesgos <u>identificados</u>. La administra el líder del proyecto y forma parte de la línea base.</div>
+      <div class="card blk step"><b>Reserva de gestión</b>Para imprevistos <u>no identificados</u>. La controla el patrocinador y queda fuera de la línea base.</div>
+      <div class="card step"><b>Costo del talento</b>4 personas × 26 días × 8 h = 832 h × tarifa promedio ≈ $45.700/h ≈ <u>$38,0 M</u>. Por eso la estimación y el cronograma van antes del presupuesto.</div>
+    </div>
+  </div>
+  <p class="hint step mt">Cifras ilustrativas en pesos colombianos para el caso UniCafé.</p>
+</section>
+
+<!-- 21 VALOR GANADO -->
+<section class="slide" data-dom="4" data-title="Paso 6: valor ganado">
+  <div class="k">Paso 6 · Finanzas · Pressman · Control con valor ganado</div>
+  <h1>¿Cómo saber si vamos <em>bien</em>?</h1>
+  <div class="calc nonav" style="grid-template-columns:1fr 440px">
+    <div>
+      <p style="font-size:17px;margin-bottom:4px">UniCafé en la semana 3 · Presupuesto a la conclusión (BAC) = <b>$45,1 M</b></p>
+      <div class="sl" style="grid-template-columns:270px 1fr 70px"><span>PV · valor planificado</span><input type="range" id="ePV" min="1" max="45" value="20"><output id="vPV">20</output></div>
+      <div class="sl" style="grid-template-columns:270px 1fr 70px"><span>EV · valor ganado</span><input type="range" id="eEV" min="1" max="45" value="17"><output id="vEV">17</output></div>
+      <div class="sl" style="grid-template-columns:270px 1fr 70px"><span>AC · costo real</span><input type="range" id="eAC" min="1" max="45" value="21"><output id="vAC">21</output></div>
+      <div class="g3 mt" style="gap:10px;font-size:14px">
+        <div class="card" style="font-size:14px"><b>PV</b>Lo que se debía haber hecho</div>
+        <div class="card" style="font-size:14px"><b>EV</b>Lo que realmente se hizo, valorado según el plan</div>
+        <div class="card" style="font-size:14px"><b>AC</b>Lo que realmente se gastó</div>
+      </div>
+      <p class="hint mt">Valores en millones de pesos. Pressman los llama BCWS, BCWP y ACWP.</p>
+    </div>
+    <div class="col" style="gap:10px">
+      <div class="evk" id="evk"></div>
+      <div class="out" style="padding:10px 18px"><div class="ln" id="eTxt" style="margin:0;font-size:15px"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 25 CALIDAD -->
+<section class="slide" data-dom="2" data-title="Paso 7: calidad planificada">
+  <div class="k">Paso 7 · Calidad · Principio 3 de PMBOK 8</div>
+  <h1>La calidad también se <em>planea</em></h1>
+  <div class="g4 step stag" style="gap:12px">
+    <div class="card"><b>Criterios de aceptación</b>Cada historia dice cómo se comprueba que está lista.<small>“El pedido llega a cocina en menos de 3 s.”</small></div>
+    <div class="card"><b>Definición de terminado</b>Código revisado, probado, documentado e integrado.</div>
+    <div class="card"><b>Revisiones técnicas</b>Pressman: revisar trabajo temprano detecta defectos cuando corregirlos cuesta menos.</div>
+    <div class="card"><b>Pruebas planificadas</b>Unitarias, de integración, de aceptación y de carga en horas pico.</div>
+  </div>
+  <div class="step mt2">
+    <p style="font-weight:600;margin-bottom:8px">Pressman · Distribución típica del esfuerzo (regla 40-20-40, orientativa):</p>
+    <div class="dist"><div style="width:40%;background:var(--black)">40 % análisis y diseño</div><div style="width:20%;background:var(--red)">20 % codificación</div><div style="width:40%;background:#555">40 % pruebas y depuración</div></div>
+  </div>
+  <div class="quote step mt2">Si el cronograma no reserva tiempo para <b>probar</b>, las pruebas se recortan y los defectos llegan al usuario.</div>
+</section>
+
+<!-- 22 RIESGOS PROCESO -->
+<section class="slide" data-dom="7" data-title="Paso 8: gestión de riesgos">
+  <div class="k">Paso 8 · Riesgo · Sommerville, Pressman y PMBOK 8</div>
+  <h1>Anticipar en lugar de <em>reaccionar</em></h1>
+  <div class="flow step stag" style="justify-content:center">
+    <span class="box">IDENTIFICAR</span><span class="ar">→</span><span class="box">ANALIZAR</span><span class="ar">→</span><span class="box">PLANIFICAR RESPUESTAS</span><span class="ar">→</span><span class="box r">MONITOREAR</span><span class="ar">↺</span>
+  </div>
+  <div class="g3 step stag mt2" style="gap:14px">
+    <div class="card"><b>Riesgo de proyecto</b>Afecta el cronograma o los recursos.<small>Renuncia de un desarrollador clave.</small></div>
+    <div class="card"><b>Riesgo de producto</b>Afecta la calidad o el desempeño del software.<small>La pasarela de pagos responde lento.</small></div>
+    <div class="card"><b>Riesgo de negocio</b>Afecta a la organización que desarrolla o compra.<small>Los estudiantes no adoptan la app.</small></div>
+  </div>
+  <div class="g2 step mt2" style="gap:16px">
+    <div class="card blk"><b>Estrategias · Sommerville</b>Evitar · Minimizar · Planes de contingencia</div>
+    <div class="card red"><b>Respuestas · PMBOK 8</b>Amenazas: escalar · evitar · transferir · mitigar · aceptar<br>Oportunidades: escalar · explotar · compartir · mejorar · aceptar</div>
+  </div>
+  <div class="quote step mt">Pressman distingue la estrategia <b>reactiva</b> (apagar incendios) de la <b>proactiva</b>, y propone el plan RMMM: mitigar, monitorear y manejar.</div>
+</section>
+
+<!-- 23 TABLA DE RIESGOS -->
+<section class="slide" data-dom="7" data-title="Paso 8: exposición al riesgo">
+  <div class="k">Paso 8 · Riesgo · Pressman · Exposición al riesgo</div>
+  <h1>Exposición: <em>RE = P × C</em></h1>
+  <div class="nonav">
+    <table class="tbl rk" id="rk" style="font-size:16px"><thead><tr><th>Riesgo</th><th>Categoría</th><th class="c">P</th><th class="c">Costo (C)</th><th class="c">RE</th><th style="width:150px"></th><th>Respuesta</th></tr></thead><tbody></tbody></table>
+    <div class="g2 mt" style="grid-template-columns:1fr 1fr;align-items:center">
+      <div class="out" style="padding:10px 18px"><div class="lbl">Exposición total</div><div class="v" id="rkT" style="font-size:44px">$4,15 M</div><div class="ln" id="rkTxt" style="margin-top:0"></div></div>
+      <div class="col" style="gap:8px"><button class="pill" id="rkSort" style="align-self:flex-start">Ordenar por exposición ↓</button><p class="hint">Haz clic en una probabilidad para cambiarla (10 % a 90 %). Costos en millones de pesos.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 26 LÍNEAS BASE Y CAMBIOS -->
+<section class="slide" data-dom="1" data-title="Paso 9: líneas base y cambios">
+  <div class="k">Paso 9 · Integrar · Gobernanza</div>
+  <h1>Líneas base y <em>control de cambios</em></h1>
+  <div style="display:grid;grid-template-columns:400px 1fr;gap:28px;align-items:start">
+    <div class="col step stag" style="gap:10px">
+      <div class="card"><b>Línea base del alcance</b>Enunciado + EDT + diccionario <small>Lámina 15</small></div>
+      <div class="card"><b>Línea base del cronograma</b>26 días hábiles, ruta A → B → D → F → G <small>Lámina 20</small></div>
+      <div class="card"><b>Línea base de costos</b>$45,1 M, incluida la reserva de contingencia <small>Lámina 23</small></div>
+      <div class="card red"><b>Línea base integrada</b>Versión aprobada del plan contra la que se mide el avance con valor ganado (lámina 24).</div>
+    </div>
+    <div class="col">
+      <div class="quote step" style="font-size:18px">La cafetería pide en la semana 3: <b>“Agreguen pago con código QR.”</b></div>
+      <div class="flow step stag" style="gap:6px;flex-wrap:nowrap">
+        <span class="box" style="font-size:13px;padding:9px 10px">SOLICITUD</span><span class="ar">→</span>
+        <span class="box" style="font-size:13px;padding:9px 10px">ANÁLISIS DE IMPACTO</span><span class="ar">→</span>
+        <span class="box" style="font-size:13px;padding:9px 10px">DECISIÓN</span><span class="ar">→</span>
+        <span class="box r" style="font-size:13px;padding:9px 10px">ACTUALIZAR PLAN</span><span class="ar">→</span>
+        <span class="box w" style="font-size:13px;padding:9px 10px">COMUNICAR</span>
+      </div>
+      <table class="tbl step" style="font-size:15px"><thead><tr><th>Impacto analizado</th><th>Resultado</th></tr></thead><tbody>
+        <tr><td><b>Alcance</b></td><td>Nuevo paquete 1.4.4 Pago QR</td></tr>
+        <tr><td><b>Cronograma</b></td><td>+3 días en la ruta crítica</td></tr>
+        <tr><td><b>Costos</b></td><td>+$1,8 M; no cabe en la contingencia</td></tr>
+        <tr><td><b>Riesgo</b></td><td>Nueva integración con un proveedor externo</td></tr>
+      </tbody></table>
+      <div class="g2 step" style="gap:10px">
+        <div class="card blk" style="font-size:15px"><b>Decide el patrocinador</b>Aprobar, rechazar o dejarlo para una segunda versión. En ágil, entra al backlog y se reprioriza.</div>
+        <div class="card" style="font-size:15px"><b>Adquisiciones</b>Pasarela de pagos y nube se contratan: qué comprar, a quién y con qué tipo de contrato.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 27 PLAN DEL PROYECTO -->
+<section class="slide" data-title="Paso 9: el plan del proyecto">
+  <div class="k">Paso 9 · Integrar · Sommerville y PMBOK 8</div>
+  <h1>¿Qué contiene el <em>plan del proyecto</em>?</h1>
+  <table class="tbl" style="font-size:16px"><thead><tr><th>Sección del plan · Sommerville</th><th>Pregunta que responde</th><th>Dominio PMBOK 8</th><th>Herramienta</th></tr></thead><tbody>
+    <tr class="step"><td><b>Introducción</b></td><td>¿Por qué existe el proyecto y qué restricciones tiene?</td><td>Gobernanza</td><td>Acta</td></tr>
+    <tr class="step"><td><b>Organización del proyecto</b></td><td>¿Quién participa y con qué rol?</td><td>Recursos · Interesados</td><td>RACI</td></tr>
+    <tr class="step"><td><b>Análisis de riesgos</b></td><td>¿Qué puede salir mal y cómo responder?</td><td>Riesgo</td><td>Tabla RE</td></tr>
+    <tr class="step"><td><b>Recursos de hardware y software</b></td><td>¿Qué se necesita y cuánto cuesta?</td><td>Recursos · Finanzas</td><td>Presupuesto</td></tr>
+    <tr class="step"><td><b>Desglose del trabajo</b></td><td>¿Qué trabajo y entregables hay?</td><td>Alcance</td><td>MoSCoW · EDT</td></tr>
+    <tr class="step"><td><b>Calendarización</b></td><td>¿En qué orden y cuándo?</td><td>Cronograma</td><td>Estimación · Gantt · Hitos</td></tr>
+    <tr class="step"><td><b>Monitoreo e informes</b></td><td>¿Cómo sabremos si vamos bien?</td><td>Finanzas · Gobernanza</td><td>Valor ganado</td></tr>
+  </tbody></table>
+  <div class="concept step mt">Cada sección del plan corresponde a una herramienta que ya construimos en esta guía</div>
+</section>
+
+<!-- 28 GLOSARIO -->
+<section class="slide" data-title="Glosario de siglas">
+  <div class="k">Referencia rápida</div>
+  <h1 style="margin-bottom:6px">Glosario de <em>siglas</em></h1>
+  <p class="sub" style="margin:0 0 12px">Haz clic en una sigla para ver su definición completa. El glosario, con más de 70 términos, se abre en cualquier lámina con la tecla <b>L</b> o el botón <b>Glosario</b>.</p>
+  <div class="sgrid nonav" id="sgrid"></div>
+</section>
+
+<!-- 29 QUIZ -->
+<section class="slide" data-title="Autoevaluación">
+  <div class="k">Comprueba lo aprendido</div>
+  <h1 style="margin-bottom:10px"><em>Autoevaluación</em></h1>
+  <div class="qz nonav">
+    <div class="qnav" id="qnav"></div>
+    <div class="qbox" id="qbox"></div>
+  </div>
+</section>
+
+<!-- 28 CIERRE -->
+<section class="slide dark hero" data-title="Cierre" style="--img:url('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1920&q=80')">
+  <div class="k">Cierre</div>
+  <h1 style="font-size:60px">Un buen plan no elimina la incertidumbre.<br><em>La hace visible y manejable.</em></h1>
+  <p class="sub" style="margin-top:4px">La secuencia que debes recordar:</p>
+  <div class="flow step stag" style="gap:6px">
+    <span class="chip r" style="font-size:14px;padding:7px 12px">1 ACTA E INTERESADOS</span><span class="ar">→</span><span class="chip r" style="font-size:14px;padding:7px 12px">2 REQUISITOS Y EDT</span><span class="ar">→</span><span class="chip r" style="font-size:14px;padding:7px 12px">3 ESTIMACIÓN</span><span class="ar">→</span><span class="chip r" style="font-size:14px;padding:7px 12px">4 CRONOGRAMA</span><span class="ar">→</span><span class="chip r" style="font-size:14px;padding:7px 12px">5 RECURSOS</span><span class="ar">→</span>
+    <span class="chip r" style="font-size:14px;padding:7px 12px">6 PRESUPUESTO</span><span class="ar">→</span><span class="chip r" style="font-size:14px;padding:7px 12px">7 CALIDAD</span><span class="ar">→</span><span class="chip r" style="font-size:14px;padding:7px 12px">8 RIESGOS</span><span class="ar">→</span><span class="chip" style="font-size:14px;padding:7px 12px;background:#fff;color:var(--red)">9 LÍNEAS BASE Y PLAN</span>
+  </div>
+  <div class="g3 step stag mt2">
+    <div class="card"><b>PMBOK 8</b>Piensa en valor y gestiona los siete dominios como un sistema.</div>
+    <div class="card"><b>Pressman</b>Empieza por las personas y responde las siete preguntas W5HH.</div>
+    <div class="card"><b>Sommerville</b>Elige entre plan y agilidad según el riesgo y la incertidumbre del producto.</div>
+  </div>
+  <div class="quote step mt2" style="background:var(--red);border-left-color:#fff;font-size:26px;text-align:center;padding:18px"><b style="color:#fff">Reto:</b> elabora el plan de un proyecto de software propio siguiendo los nueve pasos de esta guía.</div>
+</section>
+
+  <div id="prog"></div><div id="count"></div>
+</div>
+
+<div id="hintbar">→ / clic / espacio: avanzar · ← : retroceder · G: guía de dominios · L: glosario · I: índice · F: pantalla completa</div>
+<div id="ctl">
+  <button id="bPrev" title="Anterior">◀</button>
+  <button id="bNext" title="Siguiente">▶</button>
+  <button id="bIdx">☰ Índice</button>
+  <button id="bFull" title="Pantalla completa">⛶</button>
+  <button id="bGlos">📖 Glosario</button>
+  <button id="bGuide" class="main">★ Guía de dominios</button>
+</div>
+
+<div class="modal" id="mGuide"><div class="mbox">
+  <div class="mnav" id="gNav"></div>
+  <div class="mdet" id="gDet"></div>
+</div></div>
+<div class="modal" id="mGlos"><div class="gbox">
+  <div class="ghead"><h3><em>Glosario</em> de planeación</h3><input id="gq" type="search" placeholder="Buscar sigla o término… (ej.: CPI, holgura)" autocomplete="off"><button class="x" onclick="closeM()">×</button></div>
+  <div class="gcats" id="gcats"></div>
+  <div class="glist" id="glist"></div>
+</div></div>
+<div id="tip"></div>
+<div class="modal" id="mIdx"><div class="idx" id="idxBox"></div></div>
+
+<script>
+const DOMS=[
+ {n:'Gobernanza',ico:'🏛️',q:'¿Quién decide y cómo?',o:'Roles, decisiones y control de cambios',
+  pm:'Define roles, derechos de decisión y rendición de cuentas, y alinea el proyecto con la estrategia.',
+  pr:'El proyecto (cuarta P): planear, monitorear y controlar. W5HH: ¿quién es responsable?',
+  so:'Organización del proyecto e informes de avance como parte del plan.',
+  herr:'Acta de constitución, comité de cambios, matriz RACI.',slide:12},
+ {n:'Alcance',ico:'🎯',q:'¿Qué se va a construir y qué no?',o:'Requisitos, EDT y aceptación',
+  pm:'Asegura que los resultados cumplan los requisitos acordados y sigan alineados con el valor.',
+  pr:'El producto (segunda P): entender el alcance y descomponer el problema antes de estimar.',
+  so:'Desglose del trabajo y entregables; en ágil, backlog de historias de usuario.',
+  herr:'Requisitos funcionales y no funcionales, historias de usuario, priorización MoSCoW, criterios de aceptación y EDT.',slide:15},
+ {n:'Cronograma',ico:'📅',q:'¿Cuándo y en qué orden?',o:'Actividades, dependencias y ruta crítica',
+  pm:'Crea plazos realistas, monitorea el avance y se adapta a los cambios.',
+  pr:'Principios de calendarización: compartimentar, interdependencias, tiempo, responsables, resultados e hitos.',
+  so:'Calendarización con diagramas de actividades y de barras; planeación de releases y sprints.',
+  herr:'Estimación PERT, red de actividades, Gantt, ruta crítica, hitos y velocidad.',slide:20},
+ {n:'Finanzas',ico:'💰',q:'¿Cuánto cuesta y qué valor genera?',o:'Estimación, presupuesto y valor ganado',
+  pm:'Gestiona presupuesto, financiamiento y control de costos, y el impacto financiero del alcance y el tiempo.',
+  pr:'Estimación por LOC, puntos de función y modelos empíricos; análisis del valor ganado.',
+  so:'Fijación de precios del software y modelado algorítmico de costos con COCOMO II.',
+  herr:'Descomposición por LOC o PF, COCOMO II, presupuesto con reservas, línea base de costos, SPI y CPI.',slide:23},
+ {n:'Partes interesadas',ico:'🤝',q:'¿A quién afecta y cómo lo involucramos?',o:'Identificar, comprometer y comunicar',
+  pm:'Identifica e involucra a quienes influyen o son impactados por el proyecto, con comunicación abierta.',
+  pr:'Las personas (primera P): patrocinadores, usuarios, líderes y equipo.',
+  so:'Comunicación con clientes y usuarios; en ágil, el cliente participa en la planeación.',
+  herr:'Matriz poder-interés, plan de comunicaciones, demos.',slide:13},
+ {n:'Recursos',ico:'🧰',q:'¿Con quién y con qué?',o:'Equipo, herramientas e infraestructura',
+  pm:'Planifica y gestiona las personas, materiales y herramientas necesarios.',
+  pr:'Equipo de software, coordinación y comunicación; W5HH: ¿cuánto de cada recurso?',
+  so:'Gestión de personas y trabajo en equipo; recursos de hardware y software en el plan.',
+  herr:'Matriz RACI, histograma de recursos, plan de capacitación.',slide:22},
+ {n:'Riesgo',ico:'⚠️',q:'¿Qué puede salir mal o mejor?',o:'Amenazas, oportunidades y respuestas',
+  pm:'Identifica, evalúa y responde de forma proactiva a amenazas y oportunidades durante todo el proyecto.',
+  pr:'Estrategia proactiva, tabla de riesgos, exposición RE = P × C y plan RMMM.',
+  so:'Riesgos de proyecto, producto y negocio; evitar, minimizar o planes de contingencia.',
+  herr:'Registro de riesgos, tabla de exposición, respuestas a amenazas y oportunidades, reserva de contingencia.',slide:26}
+];
+const slides=[...document.querySelectorAll('.slide')];
+const stage=document.getElementById('stage');
+const N=slides.length; let cur=0; const shown=slides.map(()=>0);
+const fmt=(x,d=1)=>x.toFixed(d).replace('.',',');
+
+function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);stage.style.transform=`scale(${s})`;stage.style.left=((innerWidth-1280*s)/2)+'px';stage.style.top=((innerHeight-720*s)/2)+'px';}
+addEventListener('resize',fit);fit();
+
+/* órbita */
+(function(){const o=document.getElementById('orbit');DOMS.forEach((d,i)=>{const a=(-90+i*360/7)*Math.PI/180;const el=document.createElement('div');el.className='nd step';el.style.left=(50+38*Math.cos(a))+'%';el.style.top=(50+38*Math.sin(a))+'%';el.innerHTML=`<b><i>${i+1}</i>${d.n.toUpperCase()}</b><span>${d.o}</span>`;el.onclick=e=>{e.stopPropagation();openGuide(i)};o.appendChild(el);});})();
+
+/* W5HH */
+const W5=[
+ {t:'¿POR QUÉ?',s:'Why',q:'¿Por qué se desarrolla el sistema?',d:'Valida la justificación de negocio: ¿vale la pena el esfuerzo?',e:'Reducir filas y tiempos de espera en horas pico.'},
+ {t:'¿QUÉ?',s:'What',q:'¿Qué se hará?',d:'Define el conjunto de tareas y entregables.',e:'App de pedidos y pagos, panel de cocina y caja, reportes.'},
+ {t:'¿CUÁNDO?',s:'When',q:'¿Cuándo se hará?',d:'Establece el cronograma y los hitos clave.',e:'26 días de trabajo; salida antes del inicio del semestre.'},
+ {t:'¿QUIÉN?',s:'Who',q:'¿Quién es responsable de cada función?',d:'Asigna roles y responsabilidades a cada persona.',e:'Líder, 2 desarrolladores, QA/UX; aprueba la dirección administrativa.'},
+ {t:'¿DÓNDE?',s:'Where',q:'¿Dónde están ubicados organizacionalmente?',d:'No todos los roles están en el equipo: el cliente y otros interesados también tienen responsabilidades.',e:'TI de la universidad (servidores) y personal de la cafetería (pruebas).'},
+ {t:'¿CÓMO?',s:'How',q:'¿Cómo se hará el trabajo técnica y administrativamente?',d:'Define la estrategia técnica y de gestión, una vez acordado el alcance.',e:'Enfoque híbrido, sprints de 2 semanas, arquitectura app + API.'},
+ {t:'¿CUÁNTO?',s:'How much',q:'¿Cuánto de cada recurso se necesita?',d:'Resultado de las estimaciones de esfuerzo, tiempo y costo.',e:'Presupuesto total de $47,2 M, incluidas las reservas.'}
+];
+const w5=document.getElementById('w5');
+w5.innerHTML=W5.map((w,i)=>`<button data-i="${i}"><div class="t">${w.t}</div><small>${w.s}</small></button>`).join('');
+function w5Set(i){[...w5.children].forEach((b,j)=>b.classList.toggle('on',j===i));const w=W5[i];document.getElementById('w5ans').innerHTML=`<h3>${w.q}</h3><p>${w.d}</p><p class="ex"><b>UniCafé:</b> ${w.e}</p>`;}
+[...w5.children].forEach(b=>b.onclick=()=>w5Set(+b.dataset.i));w5Set(0);
+
+/* PERT */
+const pO=document.getElementById('pO'),pM=document.getElementById('pM'),pP=document.getElementById('pP');
+function pert(src){
+  let o=+pO.value,m=+pM.value,p=+pP.value;
+  if(src==='O'){if(m<o)pM.value=m=o;if(p<m)pP.value=p=m}
+  if(src==='M'){if(o>m)pO.value=o=m;if(p<m)pP.value=p=m}
+  if(src==='P'){if(m>p)pM.value=m=p;if(o>m)pO.value=o=m}
+  const e=(o+4*m+p)/6,s=(p-o)/6;
+  document.getElementById('vO').textContent=o;document.getElementById('vM').textContent=m;document.getElementById('vP').textContent=p;
+  document.getElementById('pE').innerHTML=`${fmt(e)}<small>días</small>`;
+  document.getElementById('pTxt').innerHTML=`Desviación estándar σ = <b>${fmt(s,2)} días</b><br>Rango probable (E ± 2σ, ≈95 %): <b>${fmt(Math.max(0,e-2*s))} a ${fmt(e+2*s)} días</b><br>${s>2?'Alta incertidumbre: conviene descomponer la actividad.':'Incertidumbre moderada.'}`;
+  const X=v=>(v/30*100)+'%';
+  document.getElementById('pLine').innerHTML=`<div class="band" style="left:${X(Math.max(0,e-2*s))};width:${(4*s/30*100)}%"></div><div class="mk" style="left:${X(o)}">O ${o}</div><div class="mk" style="left:${X(m)}">M ${m}</div><div class="mk" style="left:${X(p)}">P ${p}</div><div class="mk e" style="left:${X(e)};top:38px">E ${fmt(e)}</div>`;
+}
+pO.oninput=()=>pert('O');pM.oninput=()=>pert('M');pP.oninput=()=>pert('P');pert();
+
+/* COCOMO */
+let cE=1.10;const cK=document.getElementById('cK');
+function cocomo(){
+  const k=+cK.value,pm=2.94*Math.pow(k,cE),t=3.67*Math.pow(pm,0.28+0.2*(cE-0.91)),st=pm/t;
+  document.getElementById('vK').textContent=k;
+  document.getElementById('cPM').innerHTML=`${fmt(pm,pm<10?1:0)}<small>personas-mes</small>`;
+  document.getElementById('cTxt').innerHTML=`Duración nominal: <b>${fmt(t)} meses</b><br>Equipo promedio: <b>${fmt(st)} personas</b><br>Productividad: <b>${Math.round(k*1000/pm)} LOC por persona-mes</b>${k<10?'<br><b style="color:#E50914">Proyecto pequeño:</b> sin calibrar con datos propios, el modelo sobreestima. UniCafé (5,2 KLOC) se estimó en 5,2 PM por descomposición (lámina 17).':''}`;
+}
+cK.oninput=cocomo;
+document.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>{cE=+b.dataset.e;document.querySelectorAll('[data-e]').forEach(x=>x.classList.toggle('on',x===b));cocomo();});
+cocomo();
+
+/* Gantt + ruta crítica */
+const TK=[{id:'A',n:'Requisitos',d:5,p:[]},{id:'B',n:'Diseño UI',d:4,p:['A']},{id:'C',n:'Diseño de base de datos',d:3,p:['A']},{id:'D',n:'Desarrollo app móvil',d:10,p:['B']},{id:'E',n:'Backend y API',d:8,p:['C']},{id:'F',n:'Integración y pruebas',d:5,p:['D','E']},{id:'G',n:'Despliegue',d:2,p:['F']}];
+(function(){
+  const M={};TK.forEach(t=>{M[t.id]=t;t.es=Math.max(0,...t.p.map(x=>M[x].ef));t.ef=t.es+t.d;});
+  const T=Math.max(...TK.map(t=>t.ef));
+  [...TK].reverse().forEach(t=>{const s=TK.filter(x=>x.p.includes(t.id));t.lf=s.length?Math.min(...s.map(x=>x.ls)):T;t.ls=t.lf-t.d;t.sl=t.ls-t.es;});
+  const P=v=>(v/T*100)+'%';
+  let h=`<div class="gr head"><div class="lb hd">Actividad · duración</div><div class="tr">${[0,5,10,15,20,25].map(v=>`<span class="tk" style="left:${P(v)}">${v}</span>`).join('')}</div><div class="fl hd">Holgura</div></div>`;
+  TK.forEach(t=>{h+=`<div class="gr"><div class="lb"><i>${t.id}</i>${t.n} · ${t.d} d</div><div class="tr"><div class="bar ${t.sl===0?'crit':''}" style="left:${P(t.es)};width:${P(t.d)}">${t.id}${t.p.length?' ← '+t.p.join(','):''}</div>${t.sl>0?`<div class="sk" style="left:${P(t.ef)};width:${P(t.sl)}"></div>`:''}</div><div class="fl ${t.sl===0?'z':''}">${t.sl}</div></div>`;});
+  const HM=[[5,'Requisitos aprobados','-50%'],[9,'Prototipo aprobado','-20%'],[24,'Pruebas aceptadas','-100%'],[26,'Producción','-30%']];
+  h+=`<div class="gr hit" style="height:44px"><div class="lb"><i>◆</i>Hitos</div><div class="tr">${HM.map(([d,t,x])=>`<span class="hmd" style="left:${P(d)}"></span><span class="hml" style="left:${P(d)};transform:translateX(${x})">${t}</span>`).join('')}</div><div class="fl"></div></div>`;
+  document.getElementById('gantt').innerHTML=h;
+})();
+
+/* Ágil */
+function agile(v){
+  const B=40,n=Math.ceil(B/v);let rest=B,h='';
+  for(let i=1;i<=n;i++){const pts=Math.min(v,rest);rest-=pts;h+=`<div class="sp ${i===n?'last':''}" style="animation-delay:${i*50}ms"><b>S${i}</b>${pts} pts</div>`;}
+  document.getElementById('spr').innerHTML=h;
+  document.getElementById('aV').innerHTML=`${n}<small>sprints</small>`;
+  const d=n*10;document.getElementById('aTxt').innerHTML=`Duración: <b>${n*2} semanas (${d} días hábiles)</b> = 40 ÷ ${v} puntos por sprint, redondeado hacia arriba.<br>${d>30?'<b>Supera los 26 días del cronograma:</b> hay que reducir alcance o mover la fecha.':d>=26?'Coherente con los 26 días hábiles del cronograma (lámina 20).':'Termina antes del cronograma: confirma que la velocidad se midió en sprints reales.'}`;
+  document.querySelectorAll('[data-v]').forEach(b=>b.classList.toggle('on',+b.dataset.v===v));
+}
+document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>agile(+b.dataset.v));agile(15);
+
+/* Valor ganado */
+function ev(){
+  const pv=+document.getElementById('ePV').value,e=+document.getElementById('eEV').value,ac=+document.getElementById('eAC').value,BAC=45.1;
+  ['PV','EV','AC'].forEach((k,i)=>document.getElementById('v'+k).textContent=[pv,e,ac][i]);
+  const spi=e/pv,cpi=e/ac,sv=e-pv,cv=e-ac,eac=BAC/cpi;
+  const K=(l,v,g)=>`<div class="kp ${g?'good':'bad'}"><div class="lbl">${l}</div><div class="v">${v}</div></div>`;
+  document.getElementById('evk').innerHTML=K('SPI = EV ÷ PV',fmt(spi,2),spi>=1)+K('CPI = EV ÷ AC',fmt(cpi,2),cpi>=1)+K('SV = EV − PV',(sv>0?'+':'')+sv+' M',sv>=0)+K('CV = EV − AC',(cv>0?'+':'')+cv+' M',cv>=0);
+  const t=spi>=1&&cpi>=1?'Adelantados y por debajo del costo.':spi>=1?'A tiempo, pero gastando más de lo planeado.':cpi>=1?'Atrasados, aunque eficientes en costo.':'Atrasados y con sobrecosto: hay que actuar ya.';
+  document.getElementById('eTxt').innerHTML=`<b>${t}</b><br>Estimación a la conclusión (EAC = BAC ÷ CPI): <b>$${fmt(eac)} M</b> ${eac>45.1?'(por encima del presupuesto)':'(dentro del presupuesto)'}`;
+}
+['ePV','eEV','eAC'].forEach(id=>document.getElementById(id).oninput=ev);ev();
+
+/* Riesgos */
+const RK=[
+ {n:'Renuncia de un desarrollador clave',c:'Personal',p:20,k:5,r:'Documentar y hacer revisión de código en pareja'},
+ {n:'Cambios frecuentes de requisitos',c:'Cliente',p:40,k:2.5,r:'Backlog priorizado y demo en cada sprint'},
+ {n:'Fallas en la pasarela de pagos',c:'Tecnología',p:20,k:4,r:'Prueba de concepto en el sprint 1'},
+ {n:'Subestimación del tamaño',c:'Producto',p:30,k:1.8,r:'Estimar con dos técnicas y medir velocidad'},
+ {n:'Baja adopción de los estudiantes',c:'Negocio',p:15,k:5,r:'Prototipo validado con usuarios reales'}
+];
+function rkRender(){
+  const mx=Math.max(...RK.map(r=>r.p/100*r.k));let tot=0;
+  document.querySelector('#rk tbody').innerHTML=RK.map((r,i)=>{const re=r.p/100*r.k;tot+=re;return `<tr><td><b>${r.n}</b></td><td>${r.c}</td><td class="c p" data-i="${i}">${r.p} %</td><td class="c">$${fmt(r.k)} M</td><td class="c"><b>$${fmt(re,2)} M</b></td><td><div class="rbar" style="width:${re/mx*100}%"></div></td><td style="font-size:14px">${r.r}</td></tr>`}).join('');
+  document.querySelectorAll('#rk td.p').forEach(td=>td.onclick=()=>{const r=RK[+td.dataset.i];r.p=r.p>=90?10:r.p+10;rkRender();});
+  document.getElementById('rkT').textContent='$'+fmt(tot,2)+' M';
+  document.getElementById('rkTxt').innerHTML=tot<=4.1?'Cubierta por la reserva de contingencia de <b>$4,1 M</b>.':'Supera la reserva de contingencia de <b>$4,1 M</b>: revisar respuestas o reserva.';
+}
+document.getElementById('rkSort').onclick=()=>{RK.sort((a,b)=>b.p*b.k-a.p*a.k);rkRender();};
+rkRender();
+
+/* Quiz */
+const QZ=[
+ {q:'¿Cuántos dominios de desempeño propone PMBOK 8?',o:['Cinco','Seis','Siete','Doce'],a:2,e:'Gobernanza, alcance, cronograma, finanzas, partes interesadas, recursos y riesgo.'},
+ {q:'Según Pressman, ¿cuál de las 4P es el factor más importante?',o:['Producto','Personas','Proceso','Proyecto'],a:1,e:'Un equipo motivado y bien coordinado es lo que más influye en el éxito del proyecto.'},
+ {q:'Una actividad tiene O = 4, M = 6 y P = 14 días. ¿Cuál es su duración PERT?',o:['6 días','7 días','8 días','8,5 días'],a:1,e:'(4 + 4·6 + 14) ÷ 6 = 42 ÷ 6 = 7 días.'},
+ {q:'Sommerville clasifica los riesgos en…',o:['Altos, medios y bajos','Técnicos y humanos','De proyecto, de producto y de negocio','Internos y externos'],a:2,e:'Proyecto (tiempo y recursos), producto (calidad del software) y negocio (la organización).'},
+ {q:'Una actividad con holgura igual a cero…',o:['Puede retrasarse sin problema','Está en la ruta crítica','No tiene predecesoras','Ya fue terminada'],a:1,e:'Cualquier retraso en una actividad sin holgura retrasa la fecha final del proyecto.'},
+ {q:'Si CPI = 0,80, el proyecto…',o:['Está adelantado','Gasta más de lo planeado por el trabajo realizado','Está dentro del presupuesto','Tiene más valor ganado que costo'],a:1,e:'Por cada peso gastado solo se obtienen 0,80 de valor: hay sobrecosto.'},
+ {q:'¿Qué significa la sigla EDT?',o:['Estimación De Tiempos','Estructura de Desglose del Trabajo','Evaluación De Tareas','Esquema Detallado de Tecnología'],a:1,e:'La EDT (en inglés WBS) descompone todo el trabajo del proyecto en paquetes que se pueden estimar, asignar y controlar.'},
+ {q:'En la priorización MoSCoW, ¿qué indica la W?',o:['Lo que se hará la próxima semana','Lo que no se hará en esta versión','Lo que desea el patrocinador','Lo que espera aprobación'],a:1,e:'Won’t have (this time): se reconoce el requisito, pero queda fuera de esta versión y solo entra por control de cambios.'},
+ {q:'Dos técnicas de estimación dan resultados muy distintos. ¿Qué se debe hacer?',o:['Promediarlos y seguir','Elegir el menor para ganar el contrato','Revisar supuestos, datos históricos y calibración','Usar solo el juicio del líder'],a:2,e:'Pressman recomienda contrastar técnicas: una gran diferencia indica que falta información o que el modelo no está calibrado.'},
+ {q:'La reserva de gestión…',o:['Cubre riesgos identificados','La administra el equipo de desarrollo','Queda fuera de la línea base de costos','Es igual a la exposición total al riesgo'],a:2,e:'Cubre imprevistos no identificados, la controla el patrocinador y no hace parte de la línea base.'}
+];
+const QA=QZ.map(()=>null);let qi=0;
+function qRender(){
+  document.getElementById('qnav').innerHTML=QZ.map((q,i)=>`<button class="${i===qi?'sel':''} ${QA[i]===null?'':QA[i]===q.a?'ok':'ko'}" data-i="${i}"><i>${i+1}</i>Pregunta ${i+1}</button>`).join('');
+  document.querySelectorAll('#qnav button').forEach(b=>b.onclick=()=>{qi=+b.dataset.i;qRender()});
+  const q=QZ[qi],ans=QA[qi];
+  document.getElementById('qbox').innerHTML=`<h3>${qi+1}. ${q.q}</h3><div class="qopt">${q.o.map((o,j)=>`<button data-j="${j}" class="${ans===null?'':j===q.a?'right':j===ans?'wrong':''}">${String.fromCharCode(65+j)}. ${o}</button>`).join('')}</div><div class="qfb ${ans===null?'':'show'}">${ans===null?'':`<b>${ans===q.a?'¡Correcto!':'Respuesta correcta: '+String.fromCharCode(65+q.a)+'.'}</b> ${q.e}`}</div><div class="qscore">Aciertos: ${QA.filter((a,i)=>a===QZ[i].a).length} de ${QZ.length} · Respondidas: ${QA.filter(a=>a!==null).length}</div>${ans!==null&&qi<QZ.length-1?'<button class="pill mt" id="qNext">Siguiente pregunta →</button>':''}`;
+  document.querySelectorAll('.qopt button').forEach(b=>b.onclick=()=>{if(QA[qi]===null){QA[qi]=+b.dataset.j;qRender()}});
+  const nx=document.getElementById('qNext');if(nx)nx.onclick=()=>{qi++;qRender()};
+}
+qRender();
+
+/* glosario */
+const GL=[
+ ['PMI','Project Management Institute','','Organización internacional que publica la guía PMBOK y otorga certificaciones en dirección de proyectos.','Sigla','General',5,'PMI'],
+ ['PMBOK','Project Management Body of Knowledge','Guía de los Fundamentos para la Dirección de Proyectos','Estándar del PMI. La 8.ª edición (2025) propone 6 principios, 7 dominios de desempeño y 5 áreas de enfoque con 40 procesos adaptables.','Sigla','General',5,'PMBOK'],
+ ['4P','Personas, Producto, Proceso y Proyecto','Pressman','Espectro de la gestión de proyectos de software según Pressman. Las personas son el factor más importante.','Sigla','General',9,'4P'],
+ ['W5HH','Why, What, When, Who, Where, How, How much','Principio de Barry Boehm, presentado por Pressman','Siete preguntas que todo plan debe responder: por qué, qué, cuándo, quién, dónde, cómo y cuánto.','Sigla','General',10,'W5HH'],
+ ['EDT','Estructura de Desglose del Trabajo','WBS · Work Breakdown Structure','Descomposición jerárquica de todo el trabajo del proyecto en paquetes de trabajo que se pueden estimar, asignar y controlar.','Sigla','Alcance',15,'EDT|WBS'],
+ ['PERT','Program Evaluation and Review Technique','Técnica de evaluación y revisión de programas','Estimación de tres puntos: E = (O + 4M + P) ÷ 6. Incorpora la incertidumbre en la duración de cada actividad.','Sigla','Estimación',18,'PERT'],
+ ['O · M · P','Optimista · Más probable · Pesimista','','Los tres valores de una estimación de tres puntos: el mejor caso, el caso normal y el peor caso razonable.','Sigla','Estimación',18,''],
+ ['E','Duración esperada (PERT) · Exponente de escala (COCOMO)','','En PERT es el promedio ponderado de O, M y P. En COCOMO II es el exponente que hace crecer el esfuerzo con la novedad y el riesgo del proyecto.','Sigla','Estimación',19,''],
+ ['σ','Sigma · desviación estándar','','Mide la dispersión de una estimación. En PERT, σ = (P − O) ÷ 6. A mayor σ, mayor incertidumbre.','Sigla','Estimación',18,''],
+ ['LOC','Lines of Code','Líneas de código','Medida de tamaño del software. Pressman la usa en la estimación por descomposición.','Sigla','Estimación',17,'LOC'],
+ ['KLOC','Kilo Lines of Code','Miles de líneas de código','Unidad de tamaño de entrada del modelo COCOMO II.','Sigla','Estimación',19,'KLOC'],
+ ['PF','Puntos de Función','FP · Function Points','Medida del tamaño funcional del software basada en entradas, salidas, consultas, archivos e interfaces, independiente del lenguaje.','Sigla','Estimación',17,'PF'],
+ ['COCOMO II','Constructive Cost Model II','Modelo constructivo de costos','Modelo algorítmico de Barry Boehm que estima esfuerzo y duración a partir del tamaño, factores de escala y multiplicadores de esfuerzo.','Sigla','Estimación',19,'COCOMO'],
+ ['PM','Personas-mes','Person-Months','Unidad de esfuerzo: el trabajo de una persona durante un mes. Ojo: en inglés PM también abrevia Project Manager (director del proyecto).','Sigla','Estimación',19,'PM'],
+ ['RACI','Responsable, Aprobador, Consultado, Informado','Responsible, Accountable, Consulted, Informed','Matriz de asignación de responsabilidades. Solo debe haber un aprobador (A) por actividad.','Sigla','Personas',22,'RACI'],
+ ['QA','Quality Assurance','Aseguramiento de la calidad','Rol o conjunto de actividades que verifican que el software cumple los requisitos y estándares de calidad.','Sigla','Personas',9,'QA'],
+ ['UX','User Experience','Experiencia de usuario','Diseño de cómo se siente y funciona el producto para quien lo usa.','Sigla','Personas',9,'UX'],
+ ['UI','User Interface','Interfaz de usuario','Pantallas, botones y elementos visuales con los que interactúa el usuario.','Sigla','Alcance',15,'UI'],
+ ['API','Application Programming Interface','Interfaz de programación de aplicaciones','Conjunto de servicios que permite que la app móvil se comunique con el servidor (backend).','Sigla','Alcance',15,'API'],
+ ['TI','Tecnologías de la Información','IT · Information Technology','Área de la organización responsable de la infraestructura, servidores y sistemas.','Sigla','Personas',13,'TI'],
+ ['BAC','Budget at Completion','Presupuesto hasta la conclusión','Valor total de la línea base de costos. En UniCafé, $45,1 M.','Sigla','Costos',24,'BAC'],
+ ['PV','Planned Value · Valor planificado','BCWS · Budgeted Cost of Work Scheduled (Pressman)','Costo presupuestado del trabajo que debía estar terminado a una fecha.','Sigla','Costos',24,'PV|BCWS'],
+ ['EV','Earned Value · Valor ganado','BCWP · Budgeted Cost of Work Performed (Pressman)','Costo presupuestado del trabajo realmente terminado a una fecha.','Sigla','Costos',24,'EV|BCWP'],
+ ['AC','Actual Cost · Costo real','ACWP · Actual Cost of Work Performed (Pressman)','Lo que realmente se ha gastado en el trabajo realizado a una fecha.','Sigla','Costos',24,'AC|ACWP'],
+ ['SV','Schedule Variance · Variación del cronograma','SV = EV − PV','Negativa: el proyecto va atrasado. Positiva: va adelantado.','Sigla','Costos',24,'SV'],
+ ['CV','Cost Variance · Variación del costo','CV = EV − AC','Negativa: hay sobrecosto. Positiva: se gasta menos de lo planeado.','Sigla','Costos',24,'CV'],
+ ['SPI','Schedule Performance Index','Índice de desempeño del cronograma · SPI = EV ÷ PV','Menor que 1: atraso. Mayor que 1: adelanto.','Sigla','Costos',24,'SPI'],
+ ['CPI','Cost Performance Index','Índice de desempeño del costo · CPI = EV ÷ AC','Menor que 1: sobrecosto. Mayor que 1: eficiencia en costos.','Sigla','Costos',24,'CPI'],
+ ['EAC','Estimate at Completion','Estimación a la conclusión · EAC = BAC ÷ CPI','Pronóstico de cuánto costará el proyecto al terminar si continúa el desempeño actual.','Sigla','Costos',24,'EAC'],
+ ['RE','Risk Exposure','Exposición al riesgo · RE = P × C','Probabilidad del riesgo multiplicada por su costo si ocurre. La suma de las RE orienta la reserva de contingencia.','Sigla','Riesgo',27,'RE'],
+ ['RMMM','Risk Mitigation, Monitoring and Management','Mitigación, monitoreo y manejo del riesgo','Plan propuesto por Pressman: cómo reducir cada riesgo, cómo vigilarlo y qué hacer si ocurre.','Sigla','Riesgo',26,'RMMM'],
+ ['$ M','Millones de pesos colombianos','','Unidad usada en las cifras ilustrativas del caso UniCafé.','Sigla','Costos',23,''],
+ ['Acta de constitución','Documento que autoriza el proyecto','Project Charter','Define objetivo, alcance de alto nivel, restricciones, supuestos, patrocinador y autoridad del líder.','Concepto','General',12,''],
+ ['Patrocinador','Quien financia y respalda el proyecto','Sponsor','Aprueba el acta, el presupuesto y los cambios importantes; controla la reserva de gestión.','Concepto','Personas',12,''],
+ ['Interesado','Parte interesada','Stakeholder','Persona o grupo que influye en el proyecto o se ve afectado por él.','Concepto','Personas',13,''],
+ ['Principio','Norma de comportamiento','PMBOK 8','Guía de cómo pensar y actuar. PMBOK 8 define seis.','Concepto','General',6,''],
+ ['Dominio de desempeño','Área de gestión','Performance domain','PMBOK 8 define siete: gobernanza, alcance, cronograma, finanzas, partes interesadas, recursos y riesgo.','Concepto','General',7,''],
+ ['Área de enfoque','Agrupación de procesos','Focus area','PMBOK 8 define cinco: inicio, planificación, ejecución, monitoreo y control, y cierre.','Concepto','General',8,''],
+ ['Cono de incertidumbre','Precisión creciente de las estimaciones','','Al inicio una estimación puede variar mucho; se vuelve más precisa con cada fase completada.','Concepto','Estimación',3,''],
+ ['Enfoque predictivo','Dirigido por plan','Cascada','El alcance, el tiempo y el costo se definen al inicio y se controlan contra la línea base.','Concepto','General',11,''],
+ ['Enfoque adaptativo','Ágil','','El trabajo se planea y entrega en iteraciones cortas; el alcance evoluciona con la retroalimentación.','Concepto','General',11,''],
+ ['Enfoque híbrido','Combinación','','Mezcla elementos predictivos (hitos, contratos) y adaptativos (sprints, backlog).','Concepto','General',11,''],
+ ['Paquete de trabajo','Último nivel de la EDT','Work package','Unidad de trabajo que se puede estimar, asignar a un responsable y controlar.','Concepto','Alcance',15,''],
+ ['Regla del 100 %','Principio de la EDT','','La EDT incluye todo el trabajo del proyecto y nada que no lo sea.','Concepto','Alcance',15,''],
+ ['Historia de usuario','Requisito en lenguaje del usuario','User story','“Como estudiante quiero pagar desde la app para no hacer fila.” Unidad del backlog ágil.','Concepto','Alcance',14,''],
+ ['Criterio de aceptación','Condición verificable','','Define cómo se comprueba que un requisito o historia está terminado correctamente.','Concepto','Alcance',14,''],
+ ['Definición de terminado','Acuerdo de calidad del equipo','Definition of Done','Lista de condiciones que todo incremento debe cumplir: revisado, probado, documentado e integrado.','Concepto','Alcance',25,''],
+ ['MoSCoW','Must, Should, Could, Won’t','Debe, debería, podría, esta vez no','Técnica para priorizar requisitos según su importancia para la versión que se planea.','Sigla','Alcance',14,'MoSCoW'],
+ ['Requisito funcional','Qué hace el sistema','Sommerville','Servicio o función que el software debe ofrecer. Ejemplo: pagar con tarjeta desde la app.','Concepto','Alcance',14,''],
+ ['Requisito no funcional','Cómo se comporta el sistema','Sommerville','Restricción de rendimiento, seguridad, usabilidad o disponibilidad. Ejemplo: responder en menos de 3 s.','Concepto','Alcance',14,''],
+ ['Productividad','Tamaño producido por unidad de esfuerzo','LOC por persona-mes','Dato histórico del equipo que convierte el tamaño estimado en esfuerzo. Debe medirse, no suponerse.','Concepto','Estimación',17,''],
+ ['Respuestas a oportunidades','Explotar, compartir, mejorar, escalar o aceptar','PMBOK 8','Estrategias para riesgos positivos: asegurar, repartir, aumentar, trasladar o simplemente aprovechar si ocurren.','Concepto','Riesgo',26,''],
+ ['Respuestas a amenazas','Evitar, transferir, mitigar, escalar o aceptar','PMBOK 8','Estrategias para riesgos negativos. Sommerville las resume en evitar, minimizar y planes de contingencia.','Concepto','Riesgo',26,''],
+ ['Puntos de historia','Tamaño relativo','Story points','Estimación relativa del esfuerzo de una historia frente a otras; no son horas.','Concepto','Estimación',21,''],
+ ['Deseconomía de escala','Esfuerzo que crece más que el tamaño','','Cuando el exponente E es mayor que 1, duplicar el tamaño más que duplica el esfuerzo.','Concepto','Estimación',19,''],
+ ['Backlog','Lista priorizada de trabajo','Product backlog','Historias y tareas pendientes, ordenadas por valor.','Concepto','Cronograma',21,''],
+ ['Sprint','Iteración','','Periodo fijo y corto (en UniCafé, 2 semanas) en el que el equipo entrega un incremento.','Concepto','Cronograma',21,''],
+ ['Release','Versión liberada','Entrega','Conjunto de incrementos que se pone en manos de los usuarios.','Concepto','Cronograma',21,''],
+ ['Velocidad','Puntos completados por sprint','Velocity','Se mide en sprints reales y sirve para calcular cuántos sprints necesita el backlog.','Concepto','Cronograma',21,''],
+ ['Diagrama de Gantt','Diagrama de barras','','Muestra las actividades en el tiempo, su duración y sus dependencias.','Concepto','Cronograma',20,''],
+ ['Ruta crítica','Secuencia más larga de actividades','Critical path','Determina la duración mínima del proyecto. Sus actividades tienen holgura cero.','Concepto','Cronograma',20,''],
+ ['Holgura','Margen de retraso','Float · Slack','Tiempo que una actividad puede retrasarse sin mover la fecha final del proyecto.','Concepto','Cronograma',20,''],
+ ['Hito','Punto de control','Milestone','Evento significativo sin duración, como “prototipo aprobado”.','Concepto','Cronograma',20,''],
+ ['Reserva de contingencia','Dinero para riesgos identificados','','Forma parte de la línea base de costos; la administra el líder del proyecto.','Concepto','Costos',23,''],
+ ['Reserva de gestión','Dinero para imprevistos no identificados','','Queda fuera de la línea base de costos; la controla el patrocinador.','Concepto','Costos',23,''],
+ ['Valor ganado','Técnica de control integrado','Earned Value Management','Compara lo planificado, lo realizado y lo gastado para medir avance y costo.','Concepto','Costos',24,''],
+ ['Línea base','Versión aprobada del plan','Baseline','Referencia contra la que se mide el desempeño. Solo cambia mediante control de cambios.','Concepto','Integración',28,''],
+ ['Control de cambios','Proceso formal de decisión','Change control','Analiza el impacto de cada solicitud en alcance, tiempo, costo y riesgo antes de aprobarla.','Concepto','Integración',28,''],
+ ['Adquisición','Compra o contratación externa','Procurement','Planear qué se compra o contrata, a quién y con qué tipo de contrato. PMBOK 8 amplía este tema.','Concepto','Integración',28,''],
+ ['Riesgo de proyecto','Afecta tiempo o recursos','Sommerville','Ejemplo: renuncia de un desarrollador clave.','Concepto','Riesgo',26,''],
+ ['Riesgo de producto','Afecta la calidad del software','Sommerville','Ejemplo: la pasarela de pagos responde lento.','Concepto','Riesgo',26,''],
+ ['Riesgo de negocio','Afecta a la organización','Sommerville','Ejemplo: los estudiantes no adoptan la app.','Concepto','Riesgo',26,'']
+].map(a=>({t:a[0],x:a[1],en:a[2],d:a[3],ty:a[4],c:a[5],s:a[6],k:a[7]}));
+GL.sort((x,y)=>x.ty===y.ty?0:x.ty==='Sigla'?-1:1);
+const GCATS=['Todos','Siglas','General','Alcance','Estimación','Cronograma','Costos','Riesgo','Personas','Integración'];
+let gCat='Todos';
+const gq=document.getElementById('gq');
+function glosRender(){
+  const q=gq.value.trim().toLowerCase();
+  document.getElementById('gcats').innerHTML=GCATS.map(c=>`<button class="${c===gCat?'on':''}" data-c="${c}">${c}</button>`).join('');
+  document.querySelectorAll('#gcats button').forEach(b=>b.onclick=()=>{gCat=b.dataset.c;glosRender()});
+  const L=GL.filter(g=>(gCat==='Todos'||(gCat==='Siglas'?g.ty==='Sigla':g.c===gCat))&&(!q||(g.t+' '+g.x+' '+g.en+' '+g.d).toLowerCase().includes(q)));
+  document.getElementById('glist').innerHTML=L.length?L.map(g=>`<div class="ge" data-t="${g.t}"><div class="tt"><b>${g.t}</b><span>${g.x}</span></div>${g.en?`<div class="en">${g.en}</div>`:''}<p>${g.d}</p><div class="ft"><span class="ct">${g.ty} · ${g.c}</span><button onclick="jump(${g.s})">Lámina ${g.s} →</button></div></div>`).join(''):'<div class="gempty">No hay términos que coincidan con la búsqueda.</div>';
+}
+gq.oninput=glosRender;
+function openGlos(term){
+  gCat='Todos';gq.value='';glosRender();document.getElementById('mGlos').classList.add('open');tipHide();
+  if(term){const el=[...document.querySelectorAll('.ge')].find(e=>e.dataset.t===term);if(el){el.scrollIntoView({block:'center'});el.classList.add('flash');setTimeout(()=>el.classList.remove('flash'),1800)}}
+  else setTimeout(()=>gq.focus(),50);
+}
+/* resaltar siglas en las láminas */
+(function(){
+  const map={};GL.forEach(g=>g.k&&g.k.split('|').forEach(k=>map[k]=g));
+  const keys=Object.keys(map).sort((a,b)=>b.length-a.length).map(k=>k.replace(/[$]/g,'\\$&'));
+  const L='A-Za-zÁÉÍÓÚÑÜáéíóúñü';
+  const re=new RegExp(`(?<![${L}])(${keys.join('|')})(?![${L}])`,'g');
+  const skip='script,style,h1,h2,h3,button,.src,.big,.out .v,.formula,abbr,.sgrid,.gr.head';
+  slides.forEach(sl=>{
+    const w=document.createTreeWalker(sl,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement.closest(skip)||!new RegExp(re.source).test(n.nodeValue)?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});
+    const nodes=[];while(w.nextNode())nodes.push(w.currentNode);
+    nodes.forEach(n=>{re.lastIndex=0;const f=document.createDocumentFragment();let last=0,m;const v=n.nodeValue;
+      while((m=re.exec(v))){f.append(v.slice(last,m.index));const a=document.createElement('abbr');a.className='gl';a.dataset.t=map[m[1]].t;a.textContent=m[1];f.append(a);last=m.index+m[1].length;}
+      f.append(v.slice(last));n.replaceWith(f);});
+  });
+})();
+const tip=document.getElementById('tip');
+function tipHide(){tip.classList.remove('show')}
+document.addEventListener('mouseover',e=>{const a=e.target.closest('abbr.gl');if(!a){tipHide();return}
+  const g=GL.find(x=>x.t===a.dataset.t);tip.innerHTML=`<b>${g.t}</b>${g.x}${g.en?`<i>${g.en}</i>`:'<br>'}${g.d}`;
+  const r=a.getBoundingClientRect();tip.classList.add('show');const tw=tip.offsetWidth,th=tip.offsetHeight;
+  tip.style.left=Math.max(8,Math.min(innerWidth-tw-8,r.left+r.width/2-tw/2))+'px';tip.style.top=(r.top-th-10<8?r.bottom+10:r.top-th-10)+'px';});
+document.addEventListener('click',e=>{const a=e.target.closest('abbr.gl');if(a){e.stopPropagation();openGlos(a.dataset.t)}},true);
+/* lámina de siglas */
+document.getElementById('sgrid').innerHTML=GL.filter(g=>g.ty==='Sigla').map(g=>`<button data-t="${g.t}"><b>${g.t}</b><span>${g.x}</span></button>`).join('');
+document.querySelectorAll('#sgrid button').forEach(b=>b.onclick=()=>openGlos(b.dataset.t));
+document.getElementById('bGlos').onclick=()=>openGlos();
+
+/* motor de presentación */
+document.querySelectorAll('.stag').forEach(g=>[...g.children].forEach((c,i)=>c.style.setProperty('--i',i)));
+const stepsOf=slides.map(s=>[...s.querySelectorAll('.step')]);
+
+function apply(){
+  const st=stepsOf[cur];
+  st.forEach((e,j)=>e.classList.toggle('on',j<shown[cur]));
+  document.querySelectorAll('.gantt').forEach(c=>c.classList.remove('lit'));
+  st.forEach((e,j)=>{if(j<shown[cur]&&e.dataset.lit){document.getElementById(e.dataset.lit).classList.add('lit')}});
+}
+function go(i,full){
+  slides[cur].classList.remove('active');cur=i;slides[cur].classList.add('active');
+  shown[cur]=full?stepsOf[cur].length:0;apply();
+  stage.classList.toggle('dark',slides[cur].classList.contains('dark'));
+  const d=+slides[cur].dataset.dom||0,chip=document.getElementById('domchip');
+  if(d){chip.textContent='Dominio '+d+' · '+DOMS[d-1].n;chip.dataset.d=d-1;chip.classList.add('show')}else chip.classList.remove('show');
+  document.getElementById('prog').style.width=((cur+1)/N*100)+'%';
+  document.getElementById('count').textContent=(cur+1)+' / '+N;
+  history.replaceState(null,'','#'+(cur+1));
+}
+function next(){if(shown[cur]<stepsOf[cur].length){shown[cur]++;apply()}else if(cur<N-1)go(cur+1,false)}
+function prev(){if(shown[cur]>0){shown[cur]--;apply()}else if(cur>0)go(cur-1,true)}
+
+function openGuide(i){buildGuide(i);document.getElementById('mGuide').classList.add('open')}
+function buildGuide(sel){
+  const nav=document.getElementById('gNav');
+  nav.innerHTML='<h3><em>PMBOK 8</em> · Dominios</h3>'+`<button class="${sel==-1?'sel':''}" data-i="-1"><i>★</i>¿Cómo usar esta guía?</button>`+DOMS.map((d,i)=>`<button class="${sel==i?'sel':''}" data-i="${i}"><i>${i+1}</i>${d.n}</button>`).join('');
+  nav.querySelectorAll('button').forEach(b=>b.onclick=()=>buildGuide(+b.dataset.i));
+  const det=document.getElementById('gDet');
+  if(sel==-1){det.innerHTML=`<button class="x" onclick="closeM()">×</button><div class="ico">🧭</div><h2>¿Cómo usar esta guía?</h2><div class="q1">Siete dominios, tres autores, un mismo plan</div>
+   <h4>La idea clave</h4><p>PMBOK 8 organiza la dirección de proyectos en <b>siete dominios de desempeño</b> que funcionan como un sistema: una decisión en uno afecta a los demás. Pressman y Sommerville aportan las técnicas propias del software para trabajar en cada dominio.</p>
+   <h4>Cómo leer cada ficha</h4><p>Cada dominio muestra qué propone PMBOK 8, qué aporta Pressman, qué aporta Sommerville, las herramientas prácticas y la lámina donde se aplican al caso UniCafé.</p>
+   <h4>Atajos</h4><p>Con esta ventana abierta, presiona las teclas 1 a 7 para cambiar de dominio y Esc para cerrar.</p>
+   <button class="go" onclick="jump(7)">Ver los siete dominios →</button>`;return}
+  const d=DOMS[sel];
+  det.innerHTML=`<button class="x" onclick="closeM()">×</button><div class="ico">${d.ico}</div><h2>${sel+1}. ${d.n}</h2><div class="q1">${d.q}</div>
+   <h4>Tres miradas</h4><div class="trio"><div><span class="src pm">PMBOK 8</span><br>${d.pm}</div><div><span class="src pr">Pressman</span><br>${d.pr}</div><div><span class="src so">Sommerville</span><br>${d.so}</div></div>
+   <h4>Herramientas para el plan</h4><p><b>${d.herr}</b></p>
+   <button class="go" onclick="jump(${d.slide})">Ir a la lámina ${d.slide} →</button>`;
+}
+function closeM(){document.querySelectorAll('.modal').forEach(m=>m.classList.remove('open'))}
+function jump(n){closeM();go(n-1,false)}
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeM()}));
+
+document.getElementById('idxBox').innerHTML='<h3>Índice de láminas</h3>'+slides.map((s,i)=>`<button onclick="jump(${i+1})"><i>${i+1}</i>${s.dataset.title}</button>`).join('');
+
+document.getElementById('bNext').onclick=e=>{e.stopPropagation();next()};
+document.getElementById('bPrev').onclick=e=>{e.stopPropagation();prev()};
+document.getElementById('bGuide').onclick=()=>{const d=+slides[cur].dataset.dom;openGuide(d?d-1:-1)};
+document.getElementById('bIdx').onclick=()=>document.getElementById('mIdx').classList.add('open');
+document.getElementById('bFull').onclick=()=>{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()};
+document.getElementById('domchip').onclick=e=>{e.stopPropagation();openGuide(+e.currentTarget.dataset.d)};
+stage.addEventListener('click',e=>{if(!e.target.closest('.nonav,.nd,button,input,a,.route,abbr'))next()});
+addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'){if(e.key==='Escape')closeM();return}
+  const open=document.querySelector('.modal.open');
+  if(e.key==='Escape'){closeM();return}
+  if(open&&open.id==='mGuide'){if(/^[1-7]$/.test(e.key))buildGuide(+e.key-1);if(e.key==='0')buildGuide(-1);return}
+  if(open)return;
+  if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();next()}
+  else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(e.key)){e.preventDefault();prev()}
+  else if(e.key==='Home')go(0,false);else if(e.key==='End')go(N-1,true);
+  else if(e.key==='g'||e.key==='G')document.getElementById('bGuide').click();
+  else if(e.key==='i'||e.key==='I')document.getElementById('bIdx').click();
+  else if(e.key==='l'||e.key==='L')openGlos();
+  else if(e.key==='f'||e.key==='F')document.getElementById('bFull').click();
+});
+let tx=null;addEventListener('touchstart',e=>{tx=e.target.closest('input')?null:e.touches[0].clientX},{passive:true});
+addEventListener('touchend',e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){dx<0?next():prev()}tx=null},{passive:true});
+
+const h=parseInt(location.hash.slice(1));
+slides[0].classList.add('active');go(h>=1&&h<=N?h-1:0,false);
+</script>
+</body>
+</html>
